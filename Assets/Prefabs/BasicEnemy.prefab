@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 2108307280}
   - component: {fileID: 2108307281}
   - component: {fileID: 2108307282}
+  - component: {fileID: -2410753494388890424}
   m_Layer: 0
   m_Name: BasicEnemy
   m_TagString: Enemy
@@ -247,3 +248,70 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   isDead: 0
+  health: -1
+  events:
+    onDeathEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2108307281}
+          m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
+          m_MethodName: OnDeath
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    onHealthChangeEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2108307281}
+          m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
+          m_MethodName: OnHealthChanged
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &-2410753494388890424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8321811766543441125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4fb03e82ffbd49b7861d6175b7bbc6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state: 0
+  defaultState: 3
+  victim: {fileID: 0}
+  combat:
+    attackRadius: 1
+    attackDamage: 20
+    attackRate: 1
+  events:
+    OnDestinationChangeEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2108307281}
+          m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
+          m_MethodName: OnDestinationChange
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2

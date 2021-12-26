@@ -9,6 +9,7 @@ TagManager:
   - AimPoint
   - Enemy
   - Interactive
+  - GameManager
   layers:
   - Default
   - TransparentFX

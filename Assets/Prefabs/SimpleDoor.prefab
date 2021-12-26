@@ -127,5 +127,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e348be49efcc423aa83024566de3b97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  neverOpened: 1
-  cannotBeOpened: 0
+  isOpen: 0
+  openDoorPosition: {x: 0, y: 3, z: 0}
+  closedDoorPosition: {x: 0, y: -3, z: 0}
