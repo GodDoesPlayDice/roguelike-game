@@ -211,7 +211,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5000001
-  m_Speed: 1
+  m_Speed: 4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -248,8 +248,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navMeshAgent: {fileID: 0}
-  distToNoticePlayer: 3
-  distToUnnoticePlayer: 5
+  distToNoticePlayer: 4.5
+  distToUnnoticePlayer: 6
 --- !u!114 &2108307282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,11 +344,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4fb03e82ffbd49b7861d6175b7bbc6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 2
+  state: 3
   defaultState: 3
   victim: {fileID: 0}
   combat:
-    attackRadius: 1
+    attackRadius: 1.5
     attackDamage: 50
     attackRate: 1
   events:
@@ -367,5 +367,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  wanderingSpeedMultiplier: 0.5
-  wanderToPointDuration: 2
+  wandering:
+    speedMultiplier: 0.5
+    basicDuration: 1
+    durationMaxRandIncrease: 3

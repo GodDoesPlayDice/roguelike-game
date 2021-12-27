@@ -15,6 +15,7 @@ public class RoomController : MonoBehaviour
     }
     public RoomState state;
 
+    // enemies part
     [System.Serializable]
     public class EnemyType
     {
@@ -22,15 +23,24 @@ public class RoomController : MonoBehaviour
         public int amount;
     }
     public EnemyType[] enemiesToSpawn;
+    public int minEnemiesToStartSpawn = 1;
+    public int singleSpawnPortion = 3;
+    private int killsToWinCount = 0;
+    private int currentEnemiesInRoom = 0;
 
+    private int pointerToNextEnemyToSpawn = 0;
+
+    // objects to find 
     private DoorController[] doors;
-    private int aliveEnemiesCount = 0;
-
+    private EnemySpawner[] enemySpawners;
     // Start is called before the first frame update
     void Start()
     {
         state = RoomState.untouched;
         doors = GetDoors();
+        enemySpawners = GetEnemySpawners();
+
+        killsToWinCount = GetKillsToWinCount();
     }
 
     // Update is called once per frame
@@ -41,8 +51,13 @@ public class RoomController : MonoBehaviour
             case RoomState.untouched:
                 break;
             case RoomState.battle:
+                // spawn enemies
+                if (currentEnemiesInRoom < minEnemiesToStartSpawn)
+                {
+                    SpawnEnemiesPortion();
+                }
                 // check if there are alive enemies
-                if (aliveEnemiesCount <= 0)
+                if (killsToWinCount <= 0)
                 {
                     Win();
                 }
@@ -66,10 +81,9 @@ public class RoomController : MonoBehaviour
     private void StartBattle()
     {
         state = RoomState.battle;
-        // spawn enemies
-        SpawnEnemies();
         ToggleDoors("lock");
     }
+
     private void Win()
     {
         state = RoomState.win;
@@ -79,8 +93,8 @@ public class RoomController : MonoBehaviour
 
     private void OnEnemyDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
-        aliveEnemiesCount--;
-
+        killsToWinCount--;
+        currentEnemiesInRoom--;
 
         // unsubscribe to death event
         TargetController targetController;
@@ -105,6 +119,19 @@ public class RoomController : MonoBehaviour
         return result;
     }
 
+    private EnemySpawner[] GetEnemySpawners()
+    {
+        // all spawners in this scene
+        EnemySpawner[] enemySpawners = GameObject.FindObjectsOfType<EnemySpawner>();
+
+        // filter doors to get ones connected to this room
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        EnemySpawner[] result = enemySpawners.Where<EnemySpawner>(enemySpawner =>
+        boxCollider.bounds.Contains(enemySpawner.gameObject.transform.position)).ToArray();
+
+        return result;
+    }
+
     private void ToggleDoors(string action)
     {
         foreach (DoorController door in doors)
@@ -120,26 +147,64 @@ public class RoomController : MonoBehaviour
         }
     }
 
-    private void SpawnEnemies()
+    private void SpawnEnemiesPortion()
     {
-        if (enemiesToSpawn.Length > 0)
+        if (killsToWinCount > 0 && enemySpawners.Length > 0)
         {
+            int mainIndex = 0;
+            // standart spawn portion or all remaining enemies
+            int needToSpawnCount = killsToWinCount - singleSpawnPortion <= 0 ? killsToWinCount : singleSpawnPortion;
+
             foreach (EnemyType enemy in enemiesToSpawn)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < enemy.amount; i++)
                 {
-                    GameObject spawnedEnemy = Instantiate(enemy.enemy, transform.position, transform.rotation);
-
-                    // subscribe to death event
-                    TargetController enemyTarget;
-                    spawnedEnemy.TryGetComponent<TargetController>(out enemyTarget);
-                    if (enemyTarget != null)
+                    if (mainIndex == pointerToNextEnemyToSpawn && needToSpawnCount > 0)
                     {
-                        enemyTarget.events.onDeathEvent.AddListener(this.OnEnemyDeath);
-                        aliveEnemiesCount++;
+                        SpawnSingleEnemy(enemy.enemy);
+                        // quantity control
+                        needToSpawnCount--;
+                        // control of enemy selection
+                        pointerToNextEnemyToSpawn++;
                     }
+                    // control of enemy selection
+                    mainIndex++;
                 }
             }
         }
     }
+
+    private void SpawnSingleEnemy(GameObject enemy)
+    {
+        EnemySpawner randomSpawner = enemySpawners[UnityEngine.Random.Range(0, enemySpawners.Length - 1)];
+        GameObject spawnedEnemy = randomSpawner.SpawnEnemy(enemy);
+        // subscribe to death event
+        TargetController enemyTarget;
+        spawnedEnemy.TryGetComponent<TargetController>(out enemyTarget);
+        if (enemyTarget != null)
+        {
+            enemyTarget.events.onDeathEvent.AddListener(this.OnEnemyDeath);
+            currentEnemiesInRoom++;
+        }
+    }
+
+    private int GetKillsToWinCount()
+    {
+        int result = 0;
+        if (enemySpawners.Length > 0)
+        {
+            // calculating kills to win
+            foreach (EnemyType enemy in enemiesToSpawn)
+            {
+                for (int i = 0; i < enemy.amount; i++)
+                {
+                    result++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
 }

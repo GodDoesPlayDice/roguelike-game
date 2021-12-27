@@ -228,7 +228,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 50
+  m_Speed: 35
   m_Acceleration: 150
   avoidancePriority: 50
   m_AngularSpeed: 0
@@ -389,15 +389,15 @@ MonoBehaviour:
   disableControls: 0
   interactionRadius: 2
   movement:
-    movementSpeed: 300
+    movementSpeed: 200
     jumpForce: 1
     accelerationTime: 1
     turnSmoothTime: 0.2
   isGoingToDestination: 0
   navMeshAgent: {fileID: 0}
   combat:
-    meleeAttackRadius: 3
-    meleeAttackDamage: 20
+    meleeAttackRadius: 2
+    meleeAttackDamage: 15
 --- !u!114 &1492491559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,9 +410,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063fe3f0b55f445dda9993d058ce06f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: -1
+  maxHealth: 100
   isDead: 0
-  health: 1000
+  health: 100
   events:
     onDeathEvent:
       m_PersistentCalls:

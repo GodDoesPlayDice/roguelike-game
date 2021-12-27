@@ -46,10 +46,20 @@ public class MeleeEnemy : MonoBehaviour
     public EnemyEventsFields events;
 
     // wandering wariables
-    [Range(0f, 3f)]
-    public float wanderingSpeedMultiplier = .5f;
-    public float wanderToPointDuration = 2f;
+    // сombat variables
+    [System.Serializable]
+    public class EnemyWanderingFields
+    {
+        [Range(0f, 3f)]
+        public float speedMultiplier = .5f;
+        public float basicDuration = 2f;
+        public float durationMaxRandIncrease = 1f;
+    }
+    public EnemyWanderingFields wandering;
+    
     private Vector3 wanderToPoint;
+    private float lastTimeWanderPointChanged;
+    private float lastWanderingDurationRandIncrease;
 
     void Start()
     {
@@ -59,6 +69,7 @@ public class MeleeEnemy : MonoBehaviour
 
         // initial values
         lastAttackTime = Time.time;
+        lastTimeWanderPointChanged = Time.time;
         if (events.OnDestinationChangeEvent == null) events.OnDestinationChangeEvent = new UnityEvent<Vector3>();
         state = defaultState;
 
@@ -87,14 +98,25 @@ public class MeleeEnemy : MonoBehaviour
                     // speed
                     if (enemyController.navMeshAgent.speed == enemyController.NormalMovementSpeed)
                     {
-                        enemyController.navMeshAgent.speed = enemyController.NormalMovementSpeed * wanderingSpeedMultiplier;
+                        enemyController.navMeshAgent.speed = enemyController.NormalMovementSpeed * wandering.speedMultiplier;
                     }
-                    // set random near destination
-                    events.OnDestinationChangeEvent?.Invoke(transform.position);
+
+                    // calculate new wander point
+                    if (Time.time - lastTimeWanderPointChanged >= wandering.basicDuration + lastWanderingDurationRandIncrease)
+                    {
+                        float multiplier = Random.Range(2, 5);
+
+                        Vector3 randomDirection = Random.insideUnitCircle.normalized * Mathf.Clamp(multiplier, 1, multiplier < 1 ? 1 : multiplier);
+                        wanderToPoint = transform.position + new Vector3(randomDirection.x, transform.position.y, randomDirection.z);
+                        events.OnDestinationChangeEvent?.Invoke(wanderToPoint);
+
+                        lastTimeWanderPointChanged = Time.time;
+                        lastWanderingDurationRandIncrease = Random.Range(0, wandering.durationMaxRandIncrease);
+                    }
                 }
                 break;
             case MeleeEnemyState.chasingVictim:
-                // condition to continue chasing
+                // condition to start wandering
                 if (!enemyController.isPlayerNoticed)
                 {
                     state = MeleeEnemyState.wandering;
@@ -109,7 +131,7 @@ public class MeleeEnemy : MonoBehaviour
                     // change destination
                     events.OnDestinationChangeEvent?.Invoke(victimPosition);
 
-                    // change to attacking condition
+                    // condition to start attacking
                     if (distToVictim <= combat.attackRadius)
                     {
                         state = MeleeEnemyState.attacking;
@@ -145,12 +167,14 @@ public class MeleeEnemy : MonoBehaviour
     {
         if (!enemyController || enemyController.IsDead) return;
 
+        // attack radius
         if (state == MeleeEnemyState.attacking)
         {
             Gizmos.color = Color.red / 3;
             Gizmos.DrawSphere(transform.position, combat.attackRadius);
         }
 
+        // chasing player
         if (enemyController.isPlayerNoticed)
         {
 
@@ -158,6 +182,12 @@ public class MeleeEnemy : MonoBehaviour
             {
                 Gizmos.DrawLine(transform.position, victim.transform.position);
             }
+        }
+
+        // wandering point
+        if (state == MeleeEnemyState.wandering)
+        {
+            Gizmos.DrawLine(transform.position, wanderToPoint);
         }
     }
 #endif
