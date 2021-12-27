@@ -396,7 +396,7 @@ MonoBehaviour:
   isGoingToDestination: 0
   navMeshAgent: {fileID: 0}
   combat:
-    meleeAttackRadius: 1
+    meleeAttackRadius: 3
     meleeAttackDamage: 20
 --- !u!114 &1492491559
 MonoBehaviour:
@@ -410,9 +410,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063fe3f0b55f445dda9993d058ce06f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: -1
   isDead: 0
-  health: -1
+  health: 1000
   events:
     onDeathEvent:
       m_PersistentCalls:

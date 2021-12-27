@@ -106,7 +106,7 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
     {
         state = DoorState.closed;
     }
-
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -115,4 +115,5 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, rightSidePoint);
     }
+#endif
 }

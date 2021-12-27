@@ -276,25 +276,26 @@ public class PlayerController : MonoBehaviour
             isOnJumpSurface = false;
         }
     }
-
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         // melee attack range 
         if (isCloseToEnemies)
         {
-            Gizmos.color = Color.yellow / 4;
+            Gizmos.color = Color.red / 3;
         }
         else
         {
-            Gizmos.color = Color.red / 4;
+            Gizmos.color = Color.yellow / 4;
         }
         Gizmos.DrawSphere(transform.position, combat.meleeAttackRadius);
 
         // interaction range 
         if (closestObjectToInteract)
         {
-            Gizmos.color = Color.yellow / 4;
+            Gizmos.color = Color.yellow / 3;
             Gizmos.DrawLine(transform.position, closestObjectToInteract.transform.position);
         }
     }
+#endif
 }

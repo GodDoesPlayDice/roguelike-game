@@ -136,9 +136,8 @@ public class RoomController : MonoBehaviour
                     if (enemyTarget != null)
                     {
                         enemyTarget.events.onDeathEvent.AddListener(this.OnEnemyDeath);
+                        aliveEnemiesCount++;
                     }
-
-                    aliveEnemiesCount++;
                 }
             }
         }
