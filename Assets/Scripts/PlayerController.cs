@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using Target;
 
@@ -25,29 +26,25 @@ public class PlayerController : MonoBehaviour
     public class PlayerMovement
     {
         public float movementSpeed = 1f;
-        public float jumpForce = 1f;
-
         [Range(0.01f, 5)]
         public float accelerationTime = 1f;
         public float turnSmoothTime = 0.1f;
     }
     public PlayerMovement movement;
-    [HideInInspector]
-    public bool isGoingToDestination = false;
-    [HideInInspector]
-    public NavMeshAgent navMeshAgent;
+
 
     // private variables for movement
     private Vector2 movementInput;
-    
-    
-    private Vector2 currentDestination2D;
+
+    // nav mesh part
+    [HideInInspector]
+    public NavMeshAgent navMeshAgent;
+    [HideInInspector]
+    public float destinationThreshold = 0f;
+
+
     // acceleration
     private float currentMovementDuration = 0;
-    // jumping
-    private bool jumpNeeded = false;
-    private bool isOnJumpSurface = false;
-    private string jumpSurfaceTagName = "JumpSurface";
     // privates for rotation
     private float turnSmoothVelocity;
     private float targetAngleY;
@@ -63,6 +60,15 @@ public class PlayerController : MonoBehaviour
     public PlayerCombat combat;
     private MeleeAttacker meleeAttackerController;
     private bool isCloseToEnemies = false;
+
+
+    // events part
+    [System.Serializable]
+    public class PlayerEventsFields
+    {
+        public UnityEvent OnDestinationReachedEvent;
+    }
+    public PlayerEventsFields events;
 
     // input system part
     public void OnMovement(InputAction.CallbackContext value)
@@ -102,6 +108,9 @@ public class PlayerController : MonoBehaviour
         {
             navMeshAgent.enabled = false;
         }
+
+        // events
+        if (events.OnDestinationReachedEvent == null) events.OnDestinationReachedEvent = new UnityEvent();
     }
 
     // Update is called once per frame
@@ -119,20 +128,19 @@ public class PlayerController : MonoBehaviour
 
 
         // nav mesh agent movement part
-        if (isGoingToDestination)
+        if (navMeshAgent.enabled)
         {
-            // if the player has reached the destination, turn off nav mesh
-            Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
-            if (Vector2.Distance(playerPos2D, currentDestination2D) <= 0.5f)
+            // if the player has reached the destination
+            if (DidReachDestination())
             {
-                UnsetDestination();
+                events.OnDestinationReachedEvent.Invoke();
             }
         }
     }
 
     public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
     {
-        Debug.Log("Player health changed: "+ onHealthChangeEventArgs.gameObject.name);
+        Debug.Log("Player health changed: " + onHealthChangeEventArgs.gameObject.name);
     }
     public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
@@ -171,7 +179,8 @@ public class PlayerController : MonoBehaviour
             Vector2 interactivePos2D = new Vector2(interactive.transform.position.x, interactive.transform.position.z);
             Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
             float dist = Vector2.Distance(interactivePos2D, playerPos2D);
-            if (dist < minFoundDist && dist <= interactionRadius) {
+            if (dist < minFoundDist && dist <= interactionRadius)
+            {
                 minFoundDist = dist;
                 closestObjectToInteract = interactive;
             }
@@ -209,28 +218,38 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void SetDestination(Vector3 destination)
+    public void StopMovement()
     {
+        rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+    }
+
+    public void SetDestination(Vector3 destination, float destinationThreshold)
+    {
+        destinationThreshold = destinationThreshold;
         disableControls = true;
-        currentDestination2D = new Vector2(destination.x, destination.z);
         navMeshAgent.enabled = true;
         navMeshAgent.destination = destination;
-        isGoingToDestination = true;
     }
 
     public void UnsetDestination()
     {
-        currentDestination2D = new Vector2();
-        navMeshAgent.destination = new Vector3();
+        destinationThreshold = 0f;
+        navMeshAgent.destination = Vector3.zero;
         navMeshAgent.enabled = false;
         disableControls = false;
-        isGoingToDestination = false;
     }
 
-    private void Jump()
+    public bool DidReachDestination()
     {
-        if (jumpNeeded && isOnJumpSurface) rb.AddForce(0f, movement.jumpForce, 0f, ForceMode.Impulse);
-        jumpNeeded = false;
+        Vector3 destination = navMeshAgent.destination;
+        float dist = Vector2.Distance(new Vector2(destination.x, destination.z), new Vector2(transform.position.x, transform.position.z));
+        if (dist <= destinationThreshold)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }   
     }
 
     private void MeleeAttack()
@@ -250,7 +269,8 @@ public class PlayerController : MonoBehaviour
 
     private void Interact()
     {
-        if (closestObjectToInteract != null) {
+        if (closestObjectToInteract != null)
+        {
             IInteractable<PlayerController> interactableController;
             closestObjectToInteract.TryGetComponent<IInteractable<PlayerController>>(out interactableController);
 
@@ -261,21 +281,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == jumpSurfaceTagName)
-        {
-            isOnJumpSurface = true;
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == jumpSurfaceTagName)
-        {
-            isOnJumpSurface = false;
-        }
-    }
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {

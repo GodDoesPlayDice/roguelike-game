@@ -127,6 +127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e348be49efcc423aa83024566de3b97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOpen: 0
+  state: 0
+  anotherSideReachThreshold: 0.2
+  interactTimeRate: 1
   openDoorPosition: {x: 0, y: 3, z: 0}
-  closedDoorPosition: {x: 0, y: -3, z: 0}
+  leftSidePoint: {x: 0, y: 0, z: 0}
+  rightSidePoint: {x: 0, y: 0, z: 0}

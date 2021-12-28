@@ -349,8 +349,8 @@ MonoBehaviour:
   victim: {fileID: 0}
   combat:
     attackRadius: 1.5
-    attackDamage: 50
-    attackRate: 1
+    attackDamage: 10
+    attackRate: 2
   events:
     OnDestinationChangeEvent:
       m_PersistentCalls:

@@ -225,11 +225,11 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8709167718908120739}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 35
-  m_Acceleration: 150
+  m_Speed: 5
+  m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 0
   m_StoppingDistance: 0
@@ -389,15 +389,18 @@ MonoBehaviour:
   disableControls: 0
   interactionRadius: 2
   movement:
-    movementSpeed: 200
-    jumpForce: 1
-    accelerationTime: 1
+    movementSpeed: 350
+    accelerationTime: 0.7
     turnSmoothTime: 0.2
-  isGoingToDestination: 0
   navMeshAgent: {fileID: 0}
+  destinationThreshold: 0
   combat:
     meleeAttackRadius: 2
     meleeAttackDamage: 15
+  events:
+    OnDestinationReachedEvent:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &1492491559
 MonoBehaviour:
   m_ObjectHideFlags: 0

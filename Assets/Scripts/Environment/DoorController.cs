@@ -8,11 +8,18 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
 {
     public enum DoorState
     {
-        locked,
-        open,
-        closed
+        closed,
+        open
     }
-    public DoorState state;
+    public DoorState state = DoorState.closed;
+    private bool isLocked = false;
+    private bool isBusy = false;
+
+
+    [Range(0, 1)]
+    public float anotherSideReachThreshold = .1f;
+    public float interactTimeRate = 1f;
+    private float prevInteractEndTime = 0f;
 
     // vars for open and closed state difference
     [SerializeField]
@@ -28,84 +35,84 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
     public Vector3 rightSidePoint;
 
 
-    private PlayerController playerControllerRef;
-    private Vector3 currentPlayerDestination;
-    private bool lastPlayerGoingState = false;
+    private PlayerController playerController;
 
     private void Awake()
     {
-        state = DoorState.closed;
-
         rightSidePoint = (transform.position + transform.InverseTransformDirection(Vector3.right));
         leftSidePoint = (transform.position + transform.InverseTransformDirection(Vector3.left));
+    }
 
+    private void Start()
+    {
         openDoorPosition = transform.position + openDoorPosition;
         closedDoorPosition = transform.position;
         material = GetComponent<MeshRenderer>().material;
         defaultColor = material.color;
+
+        state = DoorState.closed;
+        prevInteractEndTime = Time.time;
     }
 
-    private void Update()
+    public void Interact(PlayerController player)
     {
-        switch (state)
-        {
-            case DoorState.closed:
-                if (transform.position != closedDoorPosition) transform.position = closedDoorPosition;
-                material.color = defaultColor * 2;
-                break;
-            case DoorState.open:
-                if (transform.position != openDoorPosition) transform.position = openDoorPosition;
-
-                // if the player first went to the destination point, and then reached it, close the door
-                if (playerControllerRef != null)
-                {
-                    bool currentPlayerGoingState = playerControllerRef.isGoingToDestination;
-                    if (lastPlayerGoingState == true && currentPlayerGoingState == false)
-                    {
-                        CloseDoor();
-                    }
-                    lastPlayerGoingState = playerControllerRef.isGoingToDestination;
-                }
-                break;
-            case DoorState.locked:
-                material.color = Color.red * 1.3f;
-                if (transform.position != closedDoorPosition) transform.position = closedDoorPosition;
-
-                break;
-        }
-
+        if (Time.time - prevInteractEndTime < interactTimeRate) return;
+        if (isLocked || isBusy) return;
+        // cache player controller on first interaction
+        if (playerController == null) playerController = player;
+        MakeOpen();
+        // move player
+        Vector3 playerPos = playerController.transform.position;
+        Vector3 destination = Vector3.Distance(playerPos, rightSidePoint) > Vector3.Distance(playerPos, leftSidePoint) ?
+            rightSidePoint : leftSidePoint;
+        playerController.StopMovement();
+        playerController.SetDestination(destination, anotherSideReachThreshold);
+        // subscribe on destination reached event
+        playerController.events.OnDestinationReachedEvent.AddListener(OnPlayerWalkedThrough);
+        isBusy = true;
     }
 
-    public void Interact(PlayerController playerController)
+    private void OnPlayerWalkedThrough()
     {
-        if (playerControllerRef == null) playerControllerRef = playerController;
-
-        if (state == DoorState.closed)
-        {
-            OpenDoor();
-            // move player
-            Vector3 playerPos = playerController.gameObject.transform.position;
-            currentPlayerDestination = Vector3.Distance(playerPos, rightSidePoint) > Vector3.Distance(playerPos, leftSidePoint) ? rightSidePoint : leftSidePoint;
-            playerController.SetDestination(currentPlayerDestination);
-        }
+        isBusy = false;
+        prevInteractEndTime = Time.time;
+        if (!isLocked) MakeClosed();
+        playerController.UnsetDestination();
+        // unsubscribe on destination reached event
+        playerController.events.OnDestinationReachedEvent.RemoveListener(OnPlayerWalkedThrough);
     }
 
-    private void CloseDoor()
+    private void MakeClosed()
     {
         state = DoorState.closed;
+        //maintain closed position and look
+        if (transform.position != closedDoorPosition) transform.position = closedDoorPosition;
+        material.color = defaultColor * 2;
     }
-    private void OpenDoor()
+
+    private void MakeOpen()
     {
+        if (state == DoorState.open || isLocked) return;
         state = DoorState.open;
+        //maintain closed position and look
+        if (transform.position != openDoorPosition) transform.position = openDoorPosition;
+        material.color = Color.green * 1.3f;
     }
     public void LockDoor()
     {
-        state = DoorState.locked;
+        MakeClosed();
+        isLocked = true;
+        material.color = Color.red * 1.3f;
+        if (transform.position != closedDoorPosition) transform.position = closedDoorPosition;
     }
+
     public void UnlockDoor()
     {
-        state = DoorState.closed;
+        MakeClosed();
+        isLocked = false;
     }
+
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
