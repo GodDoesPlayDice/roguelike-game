@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     // interaction variables
     public float interactionRadius = 0.5f;
-    private GameObject closestObjectToInteract;
+    private GameObject nearestInteractable;
 
     // movement variables
     [System.Serializable]
@@ -111,6 +111,9 @@ public class PlayerController : MonoBehaviour
 
         // events
         if (events.OnDestinationReachedEvent == null) events.OnDestinationReachedEvent = new UnityEvent();
+
+        StartCoroutine(UpdateNearestInteractable());
+        StartCoroutine(UpdateNearestEnemies());
     }
 
     // Update is called once per frame
@@ -155,35 +158,6 @@ public class PlayerController : MonoBehaviour
         {
             Move();
             Rotation();
-        }
-
-
-        // TEMP: define if there are enemies inside melee attack radius
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        isCloseToEnemies = false;
-        foreach (GameObject enemy in enemies)
-        {
-            if (Vector3.Distance(enemy.transform.position, transform.position) <= combat.meleeAttackRadius)
-            {
-                isCloseToEnemies = true;
-                break;
-            }
-        }
-
-        // TEMP: define if there are interaction objects inside interaction radius
-        GameObject[] interactives = GameObject.FindGameObjectsWithTag("Interactive");
-        closestObjectToInteract = null;
-        float minFoundDist = Mathf.Infinity;
-        foreach (GameObject interactive in interactives)
-        {
-            Vector2 interactivePos2D = new Vector2(interactive.transform.position.x, interactive.transform.position.z);
-            Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
-            float dist = Vector2.Distance(interactivePos2D, playerPos2D);
-            if (dist < minFoundDist && dist <= interactionRadius)
-            {
-                minFoundDist = dist;
-                closestObjectToInteract = interactive;
-            }
         }
     }
 
@@ -277,15 +251,57 @@ public class PlayerController : MonoBehaviour
 
     private void Interact()
     {
-        if (closestObjectToInteract != null)
+        if (nearestInteractable != null)
         {
             IInteractable<PlayerController> interactableController;
-            closestObjectToInteract.TryGetComponent<IInteractable<PlayerController>>(out interactableController);
+            nearestInteractable.TryGetComponent<IInteractable<PlayerController>>(out interactableController);
 
             if (interactableController != null)
             {
                 interactableController.Interact(this);
             }
+        }
+    }
+
+    private IEnumerator UpdateNearestInteractable()
+    {
+        for (; ;)
+        {
+            nearestInteractable = null;
+            // define if there are interaction objects inside interaction radius
+            GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactive");
+            float minFoundDist = Mathf.Infinity;
+            foreach (GameObject interactable in interactables)
+            {
+                Vector2 interactablePos2D = new Vector2(interactable.transform.position.x, interactable.transform.position.z);
+                Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
+                float dist = Vector2.Distance(interactablePos2D, playerPos2D);
+                if (dist < minFoundDist && dist <= interactionRadius)
+                {
+                    minFoundDist = dist;
+                    nearestInteractable = interactable;
+                }
+            }
+            yield return new WaitForSeconds(0.01f);
+        }
+    }
+
+    private IEnumerator UpdateNearestEnemies()
+    {
+        for (; ; )
+        {
+            // define if there are enemies inside melee attack radius
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            isCloseToEnemies = false;
+            foreach (GameObject enemy in enemies)
+            {
+                if (Vector3.Distance(enemy.transform.position, transform.position) <= combat.meleeAttackRadius)
+                {
+                    isCloseToEnemies = true;
+                    break;
+                }
+            }
+            yield return new WaitForSeconds(0.01f);
         }
     }
 
@@ -304,10 +320,10 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawSphere(transform.position, combat.meleeAttackRadius);
 
         // interaction range 
-        if (closestObjectToInteract)
+        if (nearestInteractable)
         {
             Gizmos.color = Color.yellow / 3;
-            Gizmos.DrawLine(transform.position, closestObjectToInteract.transform.position);
+            Gizmos.DrawLine(transform.position, nearestInteractable.transform.position);
         }
     }
 #endif

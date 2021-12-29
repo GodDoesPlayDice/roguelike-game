@@ -10,7 +10,7 @@ public class MeleeAttacker : MonoBehaviour
     {    
         TargetController targetController;
         victim.TryGetComponent<TargetController>(out targetController);
-        if (targetController != null)
+        if (targetController != null && targetController.gameObject != gameObject)
         {
             targetController.TakeDamage(damageAmount);
         }
