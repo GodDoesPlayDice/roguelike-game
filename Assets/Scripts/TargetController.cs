@@ -12,7 +12,7 @@ namespace Target
         public bool isDead = false;
 
         [SerializeField]
-        private float health = -1f;
+        private float _health = -1f;
 
 
         // events part
@@ -31,15 +31,12 @@ namespace Target
             public GameObject gameObject;
             public float currentHealth;
         }
-
         public TargetEventsFields events;
 
 
-        // Start is called before the first frame update
         void Start()
         {
-            health = maxHealth;
-
+            _health = maxHealth;
             if (events.onDeathEvent == null) events.onDeathEvent = new UnityEvent<OnDeathEventArgs>();
             if (events.onHealthChangeEvent == null) events.onHealthChangeEvent = new UnityEvent<OnHealthChangeEventArgs>();
         }
@@ -47,9 +44,9 @@ namespace Target
         public void TakeDamage(float takenDamage)
         {
             // if invincible
-            if (health == -1f) return;
+            if (_health == -1f) return;
 
-            float result = health - Mathf.Abs(takenDamage);
+            float result = _health - Mathf.Abs(takenDamage);
 
             if (result <= 0)
             {
@@ -62,7 +59,7 @@ namespace Target
             }
             else
             {
-                health = result;
+                _health = result;
                 // health change  event
                 events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
                 {
@@ -75,15 +72,15 @@ namespace Target
         public void Heal(float healAmount)
         {
             // if invincible
-            if (health == -1f || isDead) return;
+            if (_health == -1f || isDead) return;
 
-            float result = health + Mathf.Abs(healAmount);
+            float result = _health + Mathf.Abs(healAmount);
             if (result > maxHealth)
             {
                 result = maxHealth;
             }
 
-            health = result;
+            _health = result;
             // health change event
             events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
             {

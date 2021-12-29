@@ -12,7 +12,7 @@ using Target;
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
-    // some basic vars
+    // some basic vars 
     public bool disableControls = false;
     private Rigidbody rb;
     private GameObject cam;
@@ -97,19 +97,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         cam = GameObject.FindGameObjectWithTag("MainCamera");
-        movementInput = new Vector2();
         TryGetComponent<Rigidbody>(out rb);
         TryGetComponent<MeleeAttacker>(out meleeAttackerController);
         TryGetComponent<NavMeshAgent>(out navMeshAgent);
-        if (navMeshAgent != null)
-        {
-            navMeshAgent.enabled = false;
-        }
+    }
 
-        // events
+    private void Start()
+    {
+        movementInput = new Vector2();
+        if (navMeshAgent != null) navMeshAgent.enabled = false;
         if (events.OnDestinationReachedEvent == null) events.OnDestinationReachedEvent = new UnityEvent();
 
         StartCoroutine(UpdateNearestInteractable());
@@ -282,7 +281,7 @@ public class PlayerController : MonoBehaviour
                     nearestInteractable = interactable;
                 }
             }
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
@@ -301,7 +300,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 }
             }
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

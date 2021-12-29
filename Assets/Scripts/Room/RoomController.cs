@@ -25,25 +25,28 @@ public class RoomController : MonoBehaviour
     public EnemyType[] enemiesToSpawn;
     public int minEnemiesToStartSpawn = 1;
     public int singleSpawnPortion = 3;
-    private int killsToWinCount = 0;
-    private int currentEnemiesInRoom = 0;
 
-    private int pointerToNextEnemyToSpawn = 0;
+    private int _killsToWinCount = 0;
+    private int _currentEnemiesInRoom = 0;
+    private int _pointerToNextEnemyToSpawn = 0;
 
     // objects to find 
     private DoorController[] doors;
     private EnemySpawner[] enemySpawners;
-    // Start is called before the first frame update
+
+    private void Awake()
+    {
+        
+    }
+
     void Start()
     {
         state = RoomState.untouched;
         doors = GetDoors();
         enemySpawners = GetEnemySpawners();
-
-        killsToWinCount = GetKillsToWinCount();
+        _killsToWinCount = Get_killsToWinCount();
     }
 
-    // Update is called once per frame
     void Update()
     {
         switch (state)
@@ -52,12 +55,12 @@ public class RoomController : MonoBehaviour
                 break;
             case RoomState.battle:
                 // spawn enemies
-                if (currentEnemiesInRoom < minEnemiesToStartSpawn)
+                if (_currentEnemiesInRoom < minEnemiesToStartSpawn)
                 {
                     SpawnEnemiesPortion();
                 }
                 // check if there are alive enemies
-                if (killsToWinCount <= 0)
+                if (_killsToWinCount <= 0)
                 {
                     Win();
                 }
@@ -93,8 +96,8 @@ public class RoomController : MonoBehaviour
 
     private void OnEnemyDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
-        killsToWinCount--;
-        currentEnemiesInRoom--;
+        _killsToWinCount--;
+        _currentEnemiesInRoom--;
 
         // unsubscribe to death event
         TargetController targetController;
@@ -149,23 +152,23 @@ public class RoomController : MonoBehaviour
 
     private void SpawnEnemiesPortion()
     {
-        if (killsToWinCount > 0 && enemySpawners.Length > 0)
+        if (_killsToWinCount > 0 && enemySpawners.Length > 0)
         {
             int mainIndex = 0;
             // standart spawn portion or all remaining enemies
-            int needToSpawnCount = killsToWinCount - singleSpawnPortion <= 0 ? killsToWinCount : singleSpawnPortion;
+            int needToSpawnCount = _killsToWinCount - singleSpawnPortion <= 0 ? _killsToWinCount : singleSpawnPortion;
 
             foreach (EnemyType enemy in enemiesToSpawn)
             {
                 for (int i = 0; i < enemy.amount; i++)
                 {
-                    if (mainIndex == pointerToNextEnemyToSpawn && needToSpawnCount > 0)
+                    if (mainIndex == _pointerToNextEnemyToSpawn && needToSpawnCount > 0)
                     {
                         SpawnSingleEnemy(enemy.enemy);
                         // quantity control
                         needToSpawnCount--;
                         // control of enemy selection
-                        pointerToNextEnemyToSpawn++;
+                        _pointerToNextEnemyToSpawn++;
                     }
                     // control of enemy selection
                     mainIndex++;
@@ -184,11 +187,11 @@ public class RoomController : MonoBehaviour
         if (enemyTarget != null)
         {
             enemyTarget.events.onDeathEvent.AddListener(this.OnEnemyDeath);
-            currentEnemiesInRoom++;
+            _currentEnemiesInRoom++;
         }
     }
 
-    private int GetKillsToWinCount()
+    private int Get_killsToWinCount()
     {
         int result = 0;
         if (enemySpawners.Length > 0)

@@ -39,6 +39,7 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
 
     private void Awake()
     {
+        material = GetComponent<MeshRenderer>().material;
         rightSidePoint = (transform.position + transform.InverseTransformDirection(Vector3.right));
         leftSidePoint = (transform.position + transform.InverseTransformDirection(Vector3.left));
     }
@@ -47,9 +48,7 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
     {
         openDoorPosition = transform.position + openDoorPosition;
         closedDoorPosition = transform.position;
-        material = GetComponent<MeshRenderer>().material;
         defaultColor = material.color;
-
         state = DoorState.closed;
         prevInteractEndTime = Time.time;
     }

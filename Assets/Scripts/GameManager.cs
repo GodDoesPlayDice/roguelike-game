@@ -6,11 +6,13 @@ using Target;
 public class GameManager : MonoBehaviour
 {
 
-    private GameObject player;
-    TargetController playerTarget;
+    private GameObject _player;
+    private TargetController _playerTarget;
 
     private void Awake()
     {
+        _player = GameObject.FindGameObjectsWithTag("Player")[0];
+        _player.TryGetComponent<TargetController>(out _playerTarget);
         // make the object available between scenes
         GameObject[] objs = GameObject.FindGameObjectsWithTag("GameManager");
         if (objs.Length > 1)
@@ -22,11 +24,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        player = GameObject.FindGameObjectsWithTag("Player")[0];
-
-        player.TryGetComponent<TargetController>(out playerTarget);
         // subscribe to player death event
-        if (playerTarget != null) playerTarget.events.onDeathEvent.AddListener(OnPlayerDeath);
+        if (_playerTarget != null) _playerTarget.events.onDeathEvent.AddListener(OnPlayerDeath);
     }
 
     public void OnPlayerDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
@@ -34,6 +33,6 @@ public class GameManager : MonoBehaviour
         //Time.timeScale = 0;
 
         // unsubscribe to player death event
-        if (playerTarget != null) playerTarget.events.onDeathEvent.RemoveListener(OnPlayerDeath);
+        if (_playerTarget != null) _playerTarget.events.onDeathEvent.RemoveListener(OnPlayerDeath);
     }
 }

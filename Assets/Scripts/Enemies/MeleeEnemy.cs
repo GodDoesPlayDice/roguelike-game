@@ -61,20 +61,21 @@ public class MeleeEnemy : MonoBehaviour
     private float lastTimeWanderPointChanged;
     private float lastWanderingDurationRandIncrease;
 
-    void Start()
+    private void Awake()
     {
-        // getting components
         TryGetComponent<MeleeAttacker>(out meleeAttacker);
         TryGetComponent<EnemyController>(out enemyController);
+        // if player is only possible victim
+        victim = GameObject.FindGameObjectWithTag("Player");
+    }
 
+    void Start()
+    {
         // initial values
         lastAttackTime = Time.time;
         lastTimeWanderPointChanged = Time.time;
         if (events.OnDestinationChangeEvent == null) events.OnDestinationChangeEvent = new UnityEvent<Vector3>();
         state = defaultState;
-
-        // if player is only possible victim
-        victim = GameObject.FindGameObjectWithTag("Player");
     }
 
     // Update is called once per frame
