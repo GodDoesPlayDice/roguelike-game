@@ -62,9 +62,13 @@ public class DoorController : MonoBehaviour, IInteractable<PlayerController>
         if (playerController == null) playerController = player;
         MakeOpen();
         // move player
-        Vector3 playerPos = playerController.transform.position;
-        Vector3 destination = Vector3.Distance(playerPos, rightSidePoint) > Vector3.Distance(playerPos, leftSidePoint) ?
-            rightSidePoint : leftSidePoint;
+        Vector2 playerPos = new Vector2(playerController.gameObject.transform.position.x, playerController.gameObject.transform.position.z);
+        Vector2 right = new Vector2(rightSidePoint.x, rightSidePoint.z);
+        Vector2 left = new Vector2(leftSidePoint.x, leftSidePoint.z);
+        float distToRight = Vector2.Distance(playerPos, right);
+        float distToLeft = Vector2.Distance(playerPos, left);
+
+        Vector3 destination = distToRight > distToLeft ? rightSidePoint : leftSidePoint;
         playerController.StopMovement();
         playerController.SetDestination(destination, anotherSideReachThreshold);
         // subscribe on destination reached event

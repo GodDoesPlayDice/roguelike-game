@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4118954537825036528}
   - component: {fileID: 4118954537825036529}
   - component: {fileID: 4118954537825036530}
-  - component: {fileID: -3751737026110883406}
   - component: {fileID: 6376591424689347694}
   m_Layer: 0
   m_Name: SimpleDoor
@@ -99,22 +98,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!208 &-3751737026110883406
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4118954537825036531}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!114 &6376591424689347694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,7 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  anotherSideReachThreshold: 0.2
+  anotherSideReachThreshold: 0.211
   interactTimeRate: 1
   openDoorPosition: {x: 0, y: 3, z: 0}
   leftSidePoint: {x: 0, y: 0, z: 0}

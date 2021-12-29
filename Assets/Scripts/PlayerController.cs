@@ -223,9 +223,9 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
     }
 
-    public void SetDestination(Vector3 destination, float destinationThreshold)
+    public void SetDestination(Vector3 destination, float threshold)
     {
-        destinationThreshold = destinationThreshold;
+        destinationThreshold = threshold;
         disableControls = true;
         navMeshAgent.enabled = true;
         navMeshAgent.destination = destination;
@@ -237,14 +237,22 @@ public class PlayerController : MonoBehaviour
         navMeshAgent.destination = Vector3.zero;
         navMeshAgent.enabled = false;
         disableControls = false;
+        StopMovement();
     }
 
     public bool DidReachDestination()
     {
-        Vector3 destination = navMeshAgent.destination;
-        float dist = Vector2.Distance(new Vector2(destination.x, destination.z), new Vector2(transform.position.x, transform.position.z));
+        Vector2 destination = new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z);
+        Vector2 playerPos = new Vector2(transform.position.x, transform.position.z);
+
+        float dist = Vector2.Distance(destination, playerPos);
+
         if (dist <= destinationThreshold)
         {
+            //Debug.Log("player pos: " + playerPos);
+            //Debug.Log("destination: " + destination);
+            //Debug.Log("distance: " + dist);
+            //Debug.Log("threshold: " + destinationThreshold);
             return true;
         } else
         {
