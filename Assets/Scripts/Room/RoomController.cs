@@ -34,11 +34,6 @@ public class RoomController : MonoBehaviour
     private DoorController[] doors;
     private EnemySpawner[] enemySpawners;
 
-    private void Awake()
-    {
-        
-    }
-
     void Start()
     {
         state = RoomState.untouched;

@@ -264,23 +264,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   isDead: 0
-  health: -1
+  _health: 100
   events:
     onDeathEvent:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2108307281}
-          m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
-          m_MethodName: OnDeath
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 1578466432698928992}
           m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
           m_MethodName: set_enabled
@@ -294,8 +282,8 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
         - m_Target: {fileID: 2108307280}
-          m_TargetAssemblyTypeName: UnityEngine.AI.NavMeshAgent, UnityEngine
-          m_MethodName: set_isStopped
+          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+          m_MethodName: set_enabled
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -303,12 +291,12 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 1
+            m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 2108307280}
-          m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
-          m_MethodName: set_enabled
-          m_Mode: 6
+        - m_Target: {fileID: 2108307281}
+          m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
+          m_MethodName: OnDeath
+          m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

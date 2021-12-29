@@ -135,18 +135,18 @@ public class PlayerController : MonoBehaviour
             // if the player has reached the destination
             if (DidReachDestination())
             {
-                events.OnDestinationReachedEvent.Invoke();
+                events.OnDestinationReachedEvent.Invoke(); 
             }
         }
     }
 
     public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
     {
-        Debug.Log("Player health changed: " + onHealthChangeEventArgs.gameObject.name);
+        //Debug.Log("Player health changed: " + onHealthChangeEventArgs.currentHealth);
     }
     public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
-        Debug.Log("Player death: ");
+        //Debug.Log("Player death: ");
     }
 
 
@@ -174,7 +174,7 @@ public class PlayerController : MonoBehaviour
     {
         // caclulate acceleration part
         float acceleration = Mathf.Clamp01(currentMovementDuration / movement.accelerationTime);
-        float speed = Time.deltaTime * movement.movementSpeed * acceleration;
+        float speed = Time.fixedDeltaTime * movement.movementSpeed * acceleration;
 
         // camera aim part
         Vector3 movementVector = Quaternion.Euler(0f, targetAngleY, 0f) * Vector3.forward;

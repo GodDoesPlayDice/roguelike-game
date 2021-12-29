@@ -90,7 +90,7 @@ public class MeleeEnemy : MonoBehaviour
         {
             case MeleeEnemyState.wandering:
                 // condition to start chasing
-                if (enemyController.isPlayerNoticed)
+                if (enemyController.IsPlayerNoticed)
                 {
                     state = MeleeEnemyState.chasingVictim;
                 }
@@ -118,7 +118,7 @@ public class MeleeEnemy : MonoBehaviour
                 break;
             case MeleeEnemyState.chasingVictim:
                 // condition to start wandering
-                if (!enemyController.isPlayerNoticed)
+                if (!enemyController.IsPlayerNoticed)
                 {
                     state = MeleeEnemyState.wandering;
                 }
@@ -176,7 +176,7 @@ public class MeleeEnemy : MonoBehaviour
         }
 
         // chasing player
-        if (enemyController.isPlayerNoticed)
+        if (enemyController.IsPlayerNoticed)
         {
 
             if (victim?.transform?.position != null)

@@ -26,7 +26,12 @@ public class GameManager : MonoBehaviour
     {
         // subscribe to player death event
         if (_playerTarget != null) _playerTarget.events.onDeathEvent.AddListener(OnPlayerDeath);
+
+#if UNITY_ANDROID
+        Screen.fullScreen = false;
+#endif
     }
+
 
     public void OnPlayerDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {

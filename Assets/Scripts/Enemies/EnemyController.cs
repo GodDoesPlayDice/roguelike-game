@@ -19,7 +19,9 @@ public class EnemyController : MonoBehaviour
     public float distToUnnoticePlayer = 5f;
 
     private bool lastIsPlayerNoticedState;
-    public bool isPlayerNoticed
+    private Rigidbody _rb;
+
+    public bool IsPlayerNoticed
     {
         get
         {
@@ -41,11 +43,16 @@ public class EnemyController : MonoBehaviour
         set { }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         navMeshAgent = GetComponent<NavMeshAgent>();
+        TryGetComponent<Rigidbody>(out _rb);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
         if (navMeshAgent != null)
         {
             NormalMovementSpeed = navMeshAgent.speed;
@@ -64,7 +71,11 @@ public class EnemyController : MonoBehaviour
 
     public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
-        transform.position = transform.position + Vector3.down / 2;
+        if (_rb != null)
+        {
+            //_rb.AddForce(Vector3.up * 20, ForceMode.Acceleration);
+        }
+        transform.position = transform.position + Vector3.down / 1.2f;
         IsDead = true;
     }
 }

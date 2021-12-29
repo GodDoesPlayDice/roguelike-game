@@ -9,10 +9,12 @@ namespace Target
     public class TargetController : MonoBehaviour
     {
         public float maxHealth = 100f;
-        public bool isDead = false;
-
-        [SerializeField]
-        private float _health = -1f;
+        public float startHealth = 100f;
+        public bool IsDead { get; private set; }
+        public float Health
+        {
+            get; private set;
+        }
 
 
         // events part
@@ -33,10 +35,18 @@ namespace Target
         }
         public TargetEventsFields events;
 
+        private void OnValidate()
+        {
+            if (startHealth < -1)
+            {
+                startHealth = -1;
+            }
+        }
 
         void Start()
         {
-            _health = maxHealth;
+            Health = startHealth;
+            IsDead = false; // born alive babyy!
             if (events.onDeathEvent == null) events.onDeathEvent = new UnityEvent<OnDeathEventArgs>();
             if (events.onHealthChangeEvent == null) events.onHealthChangeEvent = new UnityEvent<OnHealthChangeEventArgs>();
         }
@@ -44,22 +54,22 @@ namespace Target
         public void TakeDamage(float takenDamage)
         {
             // if invincible
-            if (_health == -1f) return;
+            if (Health == -1f) return;
 
-            float result = _health - Mathf.Abs(takenDamage);
+            float result = Health - Mathf.Abs(takenDamage);
 
             if (result <= 0)
             {
                 // death event
-                if (!isDead)
+                if (!IsDead)
                 {
                     events.onDeathEvent.Invoke(new OnDeathEventArgs { gameObject = gameObject });
-                    isDead = true;
+                    IsDead = true;
                 }
             }
             else
             {
-                _health = result;
+                Health = result;
                 // health change  event
                 events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
                 {
@@ -72,15 +82,15 @@ namespace Target
         public void Heal(float healAmount)
         {
             // if invincible
-            if (_health == -1f || isDead) return;
+            if (Health == -1f || IsDead) return;
 
-            float result = _health + Mathf.Abs(healAmount);
+            float result = Health + Mathf.Abs(healAmount);
             if (result > maxHealth)
             {
                 result = maxHealth;
             }
 
-            _health = result;
+            Health = result;
             // health change event
             events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
             {
