@@ -1,81 +1,79 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.AI;
-using Target;
 
-public class EnemyController : MonoBehaviour
+namespace Enemies
 {
-    public float NormalMovementSpeed { get; private set; }
-    public bool IsDead { get; private set; } = false;
-
-    private GameObject player;
-    [HideInInspector]
-    public NavMeshAgent navMeshAgent;
-
-    public float distToNoticePlayer = 3f;
-    public float distToUnnoticePlayer = 5f;
-
-    private bool lastIsPlayerNoticedState;
-    private Rigidbody _rb;
-
-    public bool IsPlayerNoticed
+    public class EnemyController : MonoBehaviour
     {
-        get
-        {
-            float dist = Vector3.Distance(player.transform.position, transform.position);
-            bool result;
+        public float normalMovementSpeed { get; private set; }
+        public bool isDead { get; private set; } = false;
 
-            if (dist <= distToNoticePlayer ||
-                lastIsPlayerNoticedState == true && dist <= distToUnnoticePlayer)
+        private GameObject _player;
+        [HideInInspector]
+        public NavMeshAgent navMeshAgent;
+
+        public float distToNoticePlayer = 3f;
+        public float distToUnnoticePlayer = 5f;
+
+        private bool _lastIsPlayerNoticedState;
+        private Rigidbody _rb;
+
+        public bool isPlayerNoticed
+        {
+            get
             {
-                result = true;
+                float dist = Vector3.Distance(_player.transform.position, transform.position);
+                bool result;
+
+                if (dist <= distToNoticePlayer ||
+                    _lastIsPlayerNoticedState == true && dist <= distToUnnoticePlayer)
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = false;
+                }
+                _lastIsPlayerNoticedState = result;
+                return result;
             }
-            else
+            set { }
+        }
+
+        private void Awake()
+        {
+            _player = GameObject.FindGameObjectWithTag("Player");
+            navMeshAgent = GetComponent<NavMeshAgent>();
+            TryGetComponent<Rigidbody>(out _rb);
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            if (navMeshAgent != null)
             {
-                result = false;
+                normalMovementSpeed = navMeshAgent.speed;
             }
-            lastIsPlayerNoticedState = result;
-            return result;
         }
-        set { }
-    }
 
-    private void Awake()
-    {
-        player = GameObject.FindGameObjectWithTag("Player");
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        TryGetComponent<Rigidbody>(out _rb);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        if (navMeshAgent != null)
+        public void OnDestinationChange(Vector3 newDestination)
         {
-            NormalMovementSpeed = navMeshAgent.speed;
+            if (navMeshAgent.enabled) navMeshAgent.destination = newDestination;
         }
-    }
 
-    public void OnDestinationChange(Vector3 newDestination)
-    {
-        if (navMeshAgent.enabled) navMeshAgent.destination = newDestination;
-    }
-
-    public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
-    {
-
-    }
-
-    public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
-    {
-        if (_rb != null)
+        public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
         {
-            //_rb.AddForce(Vector3.up * 20, ForceMode.Acceleration);
+
         }
-        transform.position = transform.position + Vector3.down / 1.2f;
-        IsDead = true;
+
+        public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
+        {
+            if (_rb != null)
+            {
+                //_rb.AddForce(Vector3.up * 20, ForceMode.Acceleration);
+            }
+            transform.position += Vector3.down / 1.2f;
+            isDead = true;
+        }
     }
 }

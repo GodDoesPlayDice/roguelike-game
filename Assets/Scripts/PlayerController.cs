@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Combat;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using Target;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NavMeshAgent))]
@@ -14,40 +14,39 @@ public class PlayerController : MonoBehaviour
 {
     // some basic vars 
     public bool disableControls = false;
-    private Rigidbody rb;
-    private GameObject cam;
+    private Rigidbody _rb;
+    private GameObject _cam;
 
     // interaction variables
     public float interactionRadius = 0.5f;
-    private GameObject nearestInteractable;
+    private GameObject _nearestInteractable;
 
     // movement variables
     [System.Serializable]
     public class PlayerMovement
     {
         public float movementSpeed = 1f;
-        [Range(0.01f, 5)]
-        public float accelerationTime = 1f;
+        [Range(0.01f, 5)] public float accelerationTime = 1f;
         public float turnSmoothTime = 0.1f;
     }
+
     public PlayerMovement movement;
 
 
     // private variables for movement
-    private Vector2 movementInput;
+    private Vector2 _movementInput;
 
     // nav mesh part
-    [HideInInspector]
-    public NavMeshAgent navMeshAgent;
-    [HideInInspector]
-    public float destinationThreshold = 0f;
+    [HideInInspector] public NavMeshAgent navMeshAgent;
+    [HideInInspector] public float destinationThreshold = 0f;
 
 
     // acceleration
-    private float currentMovementDuration = 0;
+    private float _currentMovementDuration = 0;
+
     // privates for rotation
-    private float turnSmoothVelocity;
-    private float targetAngleY;
+    private float _turnSmoothVelocity;
+    private float _targetAngleY;
 
 
     // fighting system variables
@@ -57,9 +56,10 @@ public class PlayerController : MonoBehaviour
         public float meleeAttackRadius = 1f;
         public float meleeAttackDamage = 20f;
     }
+
     public PlayerCombat combat;
-    private MeleeAttacker meleeAttackerController;
-    private bool isCloseToEnemies = false;
+    private MeleeAttacker _meleeAttackerController;
+    private bool _isCloseToEnemies = false;
 
 
     // events part
@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
     {
         public UnityEvent OnDestinationReachedEvent;
     }
+
     public PlayerEventsFields events;
 
     // input system part
@@ -75,13 +76,14 @@ public class PlayerController : MonoBehaviour
     {
         if (value.performed)
         {
-            movementInput = value.ReadValue<Vector2>();
+            _movementInput = value.ReadValue<Vector2>();
         }
         else if (value.canceled)
         {
-            movementInput = Vector2.zero;
+            _movementInput = Vector2.zero;
         }
     }
+
     public void OnAttack(InputAction.CallbackContext value)
     {
         if (value.performed)
@@ -89,6 +91,7 @@ public class PlayerController : MonoBehaviour
             MeleeAttack();
         }
     }
+
     public void OnInteract(InputAction.CallbackContext value)
     {
         if (value.performed)
@@ -99,15 +102,15 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        cam = GameObject.FindGameObjectWithTag("MainCamera");
-        TryGetComponent<Rigidbody>(out rb);
-        TryGetComponent<MeleeAttacker>(out meleeAttackerController);
+        _cam = GameObject.FindGameObjectWithTag("MainCamera");
+        TryGetComponent<Rigidbody>(out _rb);
+        TryGetComponent<MeleeAttacker>(out _meleeAttackerController);
         TryGetComponent<NavMeshAgent>(out navMeshAgent);
     }
 
     private void Start()
     {
-        movementInput = new Vector2();
+        _movementInput = new Vector2();
         if (navMeshAgent != null) navMeshAgent.enabled = false;
         if (events.OnDestinationReachedEvent == null) events.OnDestinationReachedEvent = new UnityEvent();
 
@@ -119,13 +122,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // updating acceleration variables
-        if (movementInput.magnitude >= 0.1f)
+        if (_movementInput.magnitude >= 0.1f)
         {
-            currentMovementDuration += Time.deltaTime;
+            _currentMovementDuration += Time.deltaTime;
         }
-        else if (movementInput.magnitude == 0f)
+        else if (_movementInput.magnitude == 0f)
         {
-            currentMovementDuration = 0;
+            _currentMovementDuration = 0;
         }
 
 
@@ -135,7 +138,7 @@ public class PlayerController : MonoBehaviour
             // if the player has reached the destination
             if (DidReachDestination())
             {
-                events.OnDestinationReachedEvent.Invoke(); 
+                events.OnDestinationReachedEvent.Invoke();
             }
         }
     }
@@ -144,11 +147,11 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log("Player health changed: " + onHealthChangeEventArgs.currentHealth);
     }
+
     public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
     {
         //Debug.Log("Player death: ");
     }
-
 
 
     private void FixedUpdate()
@@ -163,9 +166,10 @@ public class PlayerController : MonoBehaviour
     private void Rotation()
     {
         // calculate camera look angle to rotate
-        targetAngleY = Mathf.Atan2(movementInput.x, movementInput.y) * Mathf.Rad2Deg + cam.transform.eulerAngles.y;
+        _targetAngleY = Mathf.Atan2(_movementInput.x, _movementInput.y) * Mathf.Rad2Deg + _cam.transform.eulerAngles.y;
         // smooth
-        float tempAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngleY, ref turnSmoothVelocity, movement.turnSmoothTime);
+        float tempAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetAngleY, ref _turnSmoothVelocity,
+            movement.turnSmoothTime);
 
         transform.rotation = Quaternion.Euler(0f, tempAngle, 0f);
     }
@@ -173,27 +177,27 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         // caclulate acceleration part
-        float acceleration = Mathf.Clamp01(currentMovementDuration / movement.accelerationTime);
+        float acceleration = Mathf.Clamp01(_currentMovementDuration / movement.accelerationTime);
         float speed = Time.fixedDeltaTime * movement.movementSpeed * acceleration;
 
         // camera aim part
-        Vector3 movementVector = Quaternion.Euler(0f, targetAngleY, 0f) * Vector3.forward;
+        Vector3 movementVector = Quaternion.Euler(0f, _targetAngleY, 0f) * Vector3.forward;
 
-        if (movementInput.magnitude >= 0.1f)
+        if (_movementInput.magnitude >= 0.1f)
         {
             // add velocity
-            rb.velocity = new Vector3(movementVector.x * speed, rb.velocity.y, movementVector.z * speed);
+            _rb.velocity = new Vector3(movementVector.x * speed, _rb.velocity.y, movementVector.z * speed);
         }
         else
         {
             // add velocity
-            rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+            _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
         }
     }
 
     public void StopMovement()
     {
-        rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+        _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
     }
 
     public void SetDestination(Vector3 destination, float threshold)
@@ -227,34 +231,31 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("distance: " + dist);
             //Debug.Log("threshold: " + destinationThreshold);
             return true;
-        } else
+        }
+        else
         {
             return false;
-        }   
+        }
     }
 
     private void MeleeAttack()
     {
-        if (meleeAttackerController != null)
+        if (_meleeAttackerController != null)
         {
-
             Collider[] enemies = Physics.OverlapSphere(transform.position, combat.meleeAttackRadius);
 
             foreach (Collider enemy in enemies)
             {
-                meleeAttackerController.Attack(enemy.gameObject, combat.meleeAttackDamage);
+                _meleeAttackerController.Attack(enemy.gameObject, combat.meleeAttackDamage);
             }
-
         }
     }
 
     private void Interact()
     {
-        if (nearestInteractable != null)
+        if (_nearestInteractable != null)
         {
-            IInteractable<PlayerController> interactableController;
-            nearestInteractable.TryGetComponent<IInteractable<PlayerController>>(out interactableController);
-
+            _nearestInteractable.TryGetComponent<IInteractable<PlayerController>>(out var interactableController);
             if (interactableController != null)
             {
                 interactableController.Interact(this);
@@ -264,39 +265,41 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator UpdateNearestInteractable()
     {
-        for (; ;)
+        for (;;)
         {
-            nearestInteractable = null;
+            _nearestInteractable = null;
             // define if there are interaction objects inside interaction radius
             GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactive");
             float minFoundDist = Mathf.Infinity;
             foreach (GameObject interactable in interactables)
             {
-                Vector2 interactablePos2D = new Vector2(interactable.transform.position.x, interactable.transform.position.z);
+                var position = interactable.transform.position;
+                Vector2 interactablePos2D = new Vector2(position.x, position.z);
                 Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
                 float dist = Vector2.Distance(interactablePos2D, playerPos2D);
                 if (dist < minFoundDist && dist <= interactionRadius)
                 {
                     minFoundDist = dist;
-                    nearestInteractable = interactable;
+                    _nearestInteractable = interactable;
                 }
             }
+
             yield return new WaitForSeconds(0.1f);
         }
     }
 
     private IEnumerator UpdateNearestEnemies()
     {
-        for (; ; )
+        for (;;)
         {
             // define if there are enemies inside melee attack radius
             GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            isCloseToEnemies = false;
+            _isCloseToEnemies = false;
             foreach (GameObject enemy in enemies)
             {
                 if (Vector3.Distance(enemy.transform.position, transform.position) <= combat.meleeAttackRadius)
                 {
-                    isCloseToEnemies = true;
+                    _isCloseToEnemies = true;
                     break;
                 }
             }
@@ -308,7 +311,7 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         // melee attack range 
-        if (isCloseToEnemies)
+        if (_isCloseToEnemies)
         {
             Gizmos.color = Color.red / 3;
         }
@@ -316,13 +319,14 @@ public class PlayerController : MonoBehaviour
         {
             Gizmos.color = Color.yellow / 4;
         }
+
         Gizmos.DrawSphere(transform.position, combat.meleeAttackRadius);
 
         // interaction range 
-        if (nearestInteractable)
+        if (_nearestInteractable)
         {
             Gizmos.color = Color.yellow / 3;
-            Gizmos.DrawLine(transform.position, nearestInteractable.transform.position);
+            Gizmos.DrawLine(transform.position, _nearestInteractable.transform.position);
         }
     }
 #endif
