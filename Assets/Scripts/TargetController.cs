@@ -16,19 +16,8 @@ public class TargetController : MonoBehaviour
     [System.Serializable]
     public class TargetEventsFields
     {
-        public UnityEvent<OnDeathEventArgs> onDeathEvent;
-        public UnityEvent<OnHealthChangeEventArgs> onHealthChangeEvent;
-    }
-
-    public class OnDeathEventArgs
-    {
-        public GameObject GameObject;
-    }
-
-    public class OnHealthChangeEventArgs
-    {
-        public GameObject GameObject;
-        public float CurrentHealth;
+        public UnityEvent<GameObject> onDeathEvent;
+        public UnityEvent<GameObject, float> onHealthChangeEvent;
     }
 
     public TargetEventsFields events;
@@ -45,11 +34,9 @@ public class TargetController : MonoBehaviour
     {
         health = startHealth;
         isDead = false; // born alive babyy!
-        if (events.onDeathEvent == null) events.onDeathEvent = new UnityEvent<OnDeathEventArgs>();
-        if (events.onHealthChangeEvent == null) events.onHealthChangeEvent = new UnityEvent<OnHealthChangeEventArgs>();
-
-        events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
-            {GameObject = gameObject, CurrentHealth = health});
+        if (events.onDeathEvent == null) events.onDeathEvent = new UnityEvent<GameObject>();
+        if (events.onHealthChangeEvent == null) events.onHealthChangeEvent = new UnityEvent<GameObject, float>();
+        events.onHealthChangeEvent.Invoke(gameObject, health);
     }
 
     public void TakeDamage(float takenDamage)
@@ -66,12 +53,8 @@ public class TargetController : MonoBehaviour
             {
                 health = 0;
                 // health change  event
-                events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
-                {
-                    GameObject = gameObject,
-                    CurrentHealth = 0
-                });
-                events.onDeathEvent.Invoke(new OnDeathEventArgs {GameObject = gameObject});
+                events.onHealthChangeEvent.Invoke(gameObject, health);
+                events.onDeathEvent.Invoke(gameObject);
                 isDead = true;
             }
         }
@@ -79,11 +62,7 @@ public class TargetController : MonoBehaviour
         {
             health = result;
             // health change  event
-            events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
-            {
-                GameObject = gameObject,
-                CurrentHealth = result
-            });
+            events.onHealthChangeEvent.Invoke(gameObject, result);
         }
     }
 
@@ -100,10 +79,7 @@ public class TargetController : MonoBehaviour
 
         health = result;
         // health change event
-        events.onHealthChangeEvent.Invoke(new OnHealthChangeEventArgs
-        {
-            GameObject = gameObject,
-            CurrentHealth = result
-        });
+        // health change  event
+        events.onHealthChangeEvent.Invoke(gameObject, result);
     }
 }

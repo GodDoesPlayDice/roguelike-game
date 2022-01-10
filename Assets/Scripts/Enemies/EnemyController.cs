@@ -61,12 +61,12 @@ namespace Enemies
             if (navMeshAgent.enabled) navMeshAgent.destination = newDestination;
         }
 
-        public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
+        public void OnHealthChanged(GameObject gameObj, float health)
         {
 
         }
 
-        public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
+        public void OnDeath(GameObject gameObj)
         {
             if (_rb != null)
             {

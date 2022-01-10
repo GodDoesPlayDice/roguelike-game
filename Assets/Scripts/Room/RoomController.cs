@@ -8,9 +8,9 @@ namespace Room
     {
         public enum RoomState
         {
-            untouched,
-            battle,
-            win
+            Untouched,
+            Battle,
+            Win
         }
         public RoomState state;
 
@@ -30,14 +30,14 @@ namespace Room
         private int _pointerToNextEnemyToSpawn = 0;
 
         // objects to find 
-        private DoorController[] doors;
-        private EnemySpawner[] enemySpawners;
+        private DoorController[] _doors;
+        private EnemySpawner[] _enemySpawners;
 
         void Start()
         {
-            state = RoomState.untouched;
-            doors = GetDoors();
-            enemySpawners = GetEnemySpawners();
+            state = RoomState.Untouched;
+            _doors = GetDoors();
+            _enemySpawners = GetEnemySpawners();
             _killsToWinCount = Get_killsToWinCount();
         }
 
@@ -45,9 +45,9 @@ namespace Room
         {
             switch (state)
             {
-                case RoomState.untouched:
+                case RoomState.Untouched:
                     break;
-                case RoomState.battle:
+                case RoomState.Battle:
                     // spawn enemies
                     if (_currentEnemiesInRoom < minEnemiesToStartSpawn)
                     {
@@ -59,16 +59,16 @@ namespace Room
                         Win();
                     }
                     break;
-                case RoomState.win:
+                case RoomState.Win:
                     break;
             }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.tag == "Player")
+            if (other.gameObject.CompareTag("Player"))
             {
-                if (state == RoomState.untouched)
+                if (state == RoomState.Untouched)
                 {
                     StartBattle();
                 }
@@ -77,25 +77,24 @@ namespace Room
 
         private void StartBattle()
         {
-            state = RoomState.battle;
+            state = RoomState.Battle;
             ToggleDoors("lock");
         }
 
         private void Win()
         {
-            state = RoomState.win;
+            state = RoomState.Win;
             Debug.Log("Win in room  " + gameObject.name);
             ToggleDoors("unlock");
         }
 
-        private void OnEnemyDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
+        private void OnEnemyDeath(GameObject gameObj)
         {
             _killsToWinCount--;
             _currentEnemiesInRoom--;
 
             // unsubscribe to death event
-            TargetController targetController;
-            onDeathEventArgs.GameObject.TryGetComponent<TargetController>(out targetController);
+            gameObj.TryGetComponent<TargetController>(out var targetController);
             if (targetController != null)
             {
                 targetController.events.onDeathEvent.RemoveListener(this.OnEnemyDeath);
@@ -131,7 +130,7 @@ namespace Room
 
         private void ToggleDoors(string action)
         {
-            foreach (DoorController door in doors)
+            foreach (DoorController door in _doors)
             {
                 if (action == "lock")
                 {
@@ -146,7 +145,7 @@ namespace Room
 
         private void SpawnEnemiesPortion()
         {
-            if (_killsToWinCount > 0 && enemySpawners.Length > 0)
+            if (_killsToWinCount > 0 && _enemySpawners.Length > 0)
             {
                 int mainIndex = 0;
                 // standart spawn portion or all remaining enemies
@@ -173,7 +172,7 @@ namespace Room
 
         private void SpawnSingleEnemy(GameObject enemy)
         {
-            EnemySpawner randomSpawner = enemySpawners[UnityEngine.Random.Range(0, enemySpawners.Length - 1)];
+            EnemySpawner randomSpawner = _enemySpawners[UnityEngine.Random.Range(0, _enemySpawners.Length - 1)];
             GameObject spawnedEnemy = randomSpawner.SpawnEnemy(enemy);
             // subscribe to death event
             TargetController enemyTarget;
@@ -188,9 +187,9 @@ namespace Room
         private int Get_killsToWinCount()
         {
             int result = 0;
-            if (enemySpawners.Length > 0)
+            if (_enemySpawners.Length > 0)
             {
-                // calculating kills to win
+                // calculating kills to Win
                 foreach (EnemyType enemy in enemiesToSpawn)
                 {
                     for (int i = 0; i < enemy.amount; i++)

@@ -24,9 +24,9 @@ namespace UI
             _playerTargetController.events.onHealthChangeEvent.AddListener(OnPlayerHealthChanged);
         }
 
-        private void OnPlayerHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
+        private void OnPlayerHealthChanged(GameObject gameObj, float health)
         {
-            healthTMP.text = $"Health: {onHealthChangeEventArgs.CurrentHealth}";
+            healthTMP.text = $"Health: {health}";
         }
 
         private void OnPlayerDamageChanged(float newVal)

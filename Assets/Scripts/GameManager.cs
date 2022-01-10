@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     private GameObject _player;
     private TargetController _playerTarget;
 
@@ -18,6 +17,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void OnPlayerDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
+    private void OnPlayerDeath(GameObject gameObj)
     {
         //Time.timeScale = 0;
 

@@ -142,12 +142,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
+    public void OnHealthChanged(GameObject gameObj, float health)
     {
         //Debug.Log("Player health changed: " + onHealthChangeEventArgs.currentHealth);
     }
 
-    public void OnDeath(TargetController.OnDeathEventArgs onDeathEventArgs)
+    public void OnDeath(GameObject gameObj)
     {
         //Debug.Log("Player death: ");
     }
