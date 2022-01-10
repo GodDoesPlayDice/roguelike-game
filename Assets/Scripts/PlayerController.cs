@@ -68,7 +68,6 @@ public class PlayerController : MonoBehaviour
     {
         public UnityEvent OnDestinationReachedEvent;
     }
-
     public PlayerEventsFields events;
 
     // input system part

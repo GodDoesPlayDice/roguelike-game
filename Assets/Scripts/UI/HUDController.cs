@@ -26,7 +26,7 @@ namespace UI
 
         private void OnPlayerHealthChanged(TargetController.OnHealthChangeEventArgs onHealthChangeEventArgs)
         {
-            healthTMP.text = $"Health: {onHealthChangeEventArgs.currentHealth}";
+            healthTMP.text = $"Health: {onHealthChangeEventArgs.CurrentHealth}";
         }
 
         private void OnPlayerDamageChanged(float newVal)

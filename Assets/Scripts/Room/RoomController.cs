@@ -95,7 +95,7 @@ namespace Room
 
             // unsubscribe to death event
             TargetController targetController;
-            onDeathEventArgs.gameObject.TryGetComponent<TargetController>(out targetController);
+            onDeathEventArgs.GameObject.TryGetComponent<TargetController>(out targetController);
             if (targetController != null)
             {
                 targetController.events.onDeathEvent.RemoveListener(this.OnEnemyDeath);
