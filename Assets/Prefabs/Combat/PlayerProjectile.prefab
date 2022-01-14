@@ -94,9 +94,10 @@ GameObject:
   - component: {fileID: 7288104298215490830}
   - component: {fileID: 5162537385286799449}
   - component: {fileID: 8069968713821595965}
+  - component: {fileID: -5392497857768673809}
   m_Layer: 0
-  m_Name: Projectile
-  m_TagString: Untagged
+  m_Name: PlayerProjectile
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125,7 +126,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8370739622347599995}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.06
@@ -146,3 +147,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &-5392497857768673809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8370739622347599995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7175675fc2ca49899a3c16c303d786d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectileLiveTime: 2
+  damage: 0
+  onProjectileHitEvent:
+    m_PersistentCalls:
+      m_Calls: []

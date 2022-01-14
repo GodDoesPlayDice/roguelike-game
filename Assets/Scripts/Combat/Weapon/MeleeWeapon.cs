@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Combat
+namespace Combat.Weapon
 {
     public class MeleeWeapon : MonoBehaviour, IWeapon
     {

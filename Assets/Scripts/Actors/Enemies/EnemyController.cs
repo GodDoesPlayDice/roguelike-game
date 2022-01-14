@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Enemies
+namespace Actors.Enemies
 {
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : MonoBehaviour, IActor
     {
+        public GameObject thisObject { get; set; }
         public float normalMovementSpeed { get; private set; }
         public bool isDead { get; private set; } = false;
 
@@ -37,7 +38,6 @@ namespace Enemies
                 _lastIsPlayerNoticedState = result;
                 return result;
             }
-            set { }
         }
 
         private void Awake()
@@ -45,6 +45,7 @@ namespace Enemies
             _player = GameObject.FindGameObjectWithTag("Player");
             navMeshAgent = GetComponent<NavMeshAgent>();
             TryGetComponent<Rigidbody>(out _rb);
+            thisObject = gameObject;
         }
 
         // Start is called before the first frame update

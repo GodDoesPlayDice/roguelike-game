@@ -1,4 +1,6 @@
+using Actors.Enemies;
 using Combat;
+using Combat.Weapon;
 using UnityEngine;
 using UnityEngine.Events;
 
