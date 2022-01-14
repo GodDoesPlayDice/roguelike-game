@@ -58,7 +58,8 @@ public class PlayerController : MonoBehaviour
     }
 
     public PlayerCombat combat;
-    private MeleeAttacker _meleeAttackerController;
+    private MeleeWeapon _meleeWeaponController;
+    private Shooter _shooterController;
     private bool _isCloseToEnemies = false;
 
 
@@ -102,9 +103,10 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         _cam = GameObject.FindGameObjectWithTag("MainCamera");
-        TryGetComponent<Rigidbody>(out _rb);
-        TryGetComponent<MeleeAttacker>(out _meleeAttackerController);
-        TryGetComponent<NavMeshAgent>(out navMeshAgent);
+        TryGetComponent(out _rb);
+        TryGetComponent(out _meleeWeaponController);
+        TryGetComponent(out _shooterController);
+        TryGetComponent(out navMeshAgent);
     }
 
     private void Start()
@@ -239,15 +241,20 @@ public class PlayerController : MonoBehaviour
 
     private void MeleeAttack()
     {
-        if (_meleeAttackerController != null)
-        {
-            Collider[] enemies = Physics.OverlapSphere(transform.position, combat.meleeAttackRadius);
+        if (_meleeWeaponController == null) return;
+        Collider[] enemies = Physics.OverlapSphere(transform.position, combat.meleeAttackRadius);
 
-            foreach (Collider enemy in enemies)
-            {
-                _meleeAttackerController.Attack(enemy.gameObject, combat.meleeAttackDamage);
-            }
+        foreach (Collider enemy in enemies)
+        {
+            _meleeWeaponController.Attack(enemy.gameObject, combat.meleeAttackDamage);
         }
+    }
+
+    private void ShootAttack()
+    {
+        if (_shooterController == null) return;
+        
+
     }
 
     private void Interact()
@@ -261,7 +268,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
+    
     private IEnumerator UpdateNearestInteractable()
     {
         for (;;)

@@ -522,7 +522,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2, y: 1}
+    m_SensorSize: {x: 2.1666667, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2336,7 +2336,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2, y: 1}
+    m_SensorSize: {x: 2.1666667, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -4179,7 +4179,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2, y: 1}
+    m_SensorSize: {x: 2.1666667, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -6658,7 +6658,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 0.17426367, y: 0.8244274, z: -0.4054706, w: 0.35432354}
+  m_LocalRotation: {x: 0.17426373, y: 0.8244274, z: -0.40547055, w: 0.35432354}
   m_LocalPosition: {x: -7.375457, y: 14.5, z: 9.361742}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7910,7 +7910,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2, y: 1}
+    m_SensorSize: {x: 2.1666667, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -7926,7 +7926,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1991121494}
-  m_LocalRotation: {x: 0.17426367, y: 0.8244275, z: -0.40547058, w: 0.3543235}
+  m_LocalRotation: {x: 0.1742637, y: 0.8244274, z: -0.40547058, w: 0.3543235}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9160,10 +9160,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
-    - target: {fileID: 8624107443046155711, guid: e7a8b8b7becd240b291c97782c4dea23, type: 3}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 1687258584}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e7a8b8b7becd240b291c97782c4dea23, type: 3}
 --- !u!1001 &8709167718820327882
@@ -9173,22 +9169,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 121962351, guid: 85dd7100221c9439c905f92a09214149, type: 3}
-      propertyPath: destinationThreshold
-      value: 0.46
-      objectReference: {fileID: 0}
-    - target: {fileID: 1492491559, guid: 85dd7100221c9439c905f92a09214149, type: 3}
-      propertyPath: _health
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 1492491559, guid: 85dd7100221c9439c905f92a09214149, type: 3}
-      propertyPath: maxHealth
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 7080671889461004442, guid: 85dd7100221c9439c905f92a09214149, type: 3}
-      propertyPath: m_AngularSpeed
-      value: 200
-      objectReference: {fileID: 0}
     - target: {fileID: 8709167718908120739, guid: 85dd7100221c9439c905f92a09214149, type: 3}
       propertyPath: m_Name
       value: Player

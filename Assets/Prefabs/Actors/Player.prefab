@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 820912426}
   - component: {fileID: 121962351}
   - component: {fileID: 1492491559}
+  - component: {fileID: 1959724826522501367}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -231,7 +232,7 @@ NavMeshAgent:
   m_Speed: 5
   m_Acceleration: 10
   avoidancePriority: 50
-  m_AngularSpeed: 0
+  m_AngularSpeed: 200
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -393,7 +394,7 @@ MonoBehaviour:
     accelerationTime: 0.7
     turnSmoothTime: 0.2
   navMeshAgent: {fileID: 0}
-  destinationThreshold: 0
+  destinationThreshold: 0.46
   combat:
     meleeAttackRadius: 2
     meleeAttackDamage: 15
@@ -413,9 +414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063fe3f0b55f445dda9993d058ce06f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  isDead: 0
-  health: 100
+  maxHealth: 300
+  startHealth: 100
   events:
     onDeathEvent:
       m_PersistentCalls:
@@ -447,3 +447,16 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &1959724826522501367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8709167718908120739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b682eaed9fe458c983e7c0ddf41d570, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectile: {fileID: 8370739622347599995, guid: c2ed850adedc84797b8cf55fc574a1a3, type: 3}

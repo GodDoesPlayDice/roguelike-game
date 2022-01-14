@@ -9,11 +9,11 @@ namespace Enemies
         // some common vars
         public enum MeleeEnemyState
         {
-            idle,
-            attacking,
-            afterAttackAttemp,
-            wandering,
-            chasingVictim,
+            Idle,
+            Attacking,
+            AfterAttackAttemp,
+            Wandering,
+            ChasingVictim,
 
         };
         public MeleeEnemyState state;
@@ -21,7 +21,7 @@ namespace Enemies
 
         [HideInInspector]
         public GameObject victim;
-        private EnemyController enemyController;
+        private EnemyController _enemyController;
 
         // сombat variables
         [System.Serializable]
@@ -34,8 +34,8 @@ namespace Enemies
         }
         public EnemyCombatFields combat;
 
-        private float lastAttackTime = 0;
-        private MeleeAttacker meleeAttacker;
+        private float _lastAttackTime = 0;
+        private MeleeWeapon _meleeWeapon;
 
 
         // events part
@@ -64,8 +64,8 @@ namespace Enemies
 
         private void Awake()
         {
-            TryGetComponent<MeleeAttacker>(out meleeAttacker);
-            TryGetComponent<EnemyController>(out enemyController);
+            TryGetComponent<MeleeWeapon>(out _meleeWeapon);
+            TryGetComponent<EnemyController>(out _enemyController);
             // if player is only possible victim
             victim = GameObject.FindGameObjectWithTag("Player");
         }
@@ -73,7 +73,7 @@ namespace Enemies
         void Start()
         {
             // initial values
-            lastAttackTime = Time.time;
+            _lastAttackTime = Time.time;
             lastTimeWanderPointChanged = Time.time;
             if (events.OnDestinationChangeEvent == null) events.OnDestinationChangeEvent = new UnityEvent<Vector3>();
             state = defaultState;
@@ -89,18 +89,18 @@ namespace Enemies
 
             switch (state)
             {
-                case MeleeEnemyState.wandering:
+                case MeleeEnemyState.Wandering:
                     // condition to start chasing
-                    if (enemyController.isPlayerNoticed)
+                    if (_enemyController.isPlayerNoticed)
                     {
-                        state = MeleeEnemyState.chasingVictim;
+                        state = MeleeEnemyState.ChasingVictim;
                     }
                     else
                     {
                         // speed
-                        if (enemyController.navMeshAgent.speed == enemyController.normalMovementSpeed)
+                        if (_enemyController.navMeshAgent.speed == _enemyController.normalMovementSpeed)
                         {
-                            enemyController.navMeshAgent.speed = enemyController.normalMovementSpeed * wandering.speedMultiplier;
+                            _enemyController.navMeshAgent.speed = _enemyController.normalMovementSpeed * wandering.speedMultiplier;
                         }
 
                         // calculate new wander point
@@ -117,18 +117,18 @@ namespace Enemies
                         }
                     }
                     break;
-                case MeleeEnemyState.chasingVictim:
+                case MeleeEnemyState.ChasingVictim:
                     // condition to start wandering
-                    if (!enemyController.isPlayerNoticed)
+                    if (!_enemyController.isPlayerNoticed)
                     {
-                        state = MeleeEnemyState.wandering;
+                        state = MeleeEnemyState.Wandering;
                     }
                     else
                     {
                         // speed
-                        if (enemyController.navMeshAgent.speed != enemyController.normalMovementSpeed)
+                        if (_enemyController.navMeshAgent.speed != _enemyController.normalMovementSpeed)
                         {
-                            enemyController.navMeshAgent.speed = enemyController.normalMovementSpeed;
+                            _enemyController.navMeshAgent.speed = _enemyController.normalMovementSpeed;
                         }
                         // change destination
                         events.OnDestinationChangeEvent?.Invoke(victimPosition);
@@ -136,26 +136,26 @@ namespace Enemies
                         // condition to start attacking
                         if (distToVictim <= combat.attackRadius)
                         {
-                            state = MeleeEnemyState.attacking;
+                            state = MeleeEnemyState.Attacking;
                         }
                     }
                     break;
-                case MeleeEnemyState.attacking:
+                case MeleeEnemyState.Attacking:
                     // condition to start wandering
                     if (distToVictim > combat.attackRadius)
                     {
-                        state = MeleeEnemyState.wandering;
+                        state = MeleeEnemyState.Wandering;
                     } else
                     {
                         // change destination to self
                         events.OnDestinationChangeEvent?.Invoke(transform.position);
                         // attack rate and attack part
-                        if (Time.time - lastAttackTime >= combat.attackRate)
+                        if (Time.time - _lastAttackTime >= combat.attackRate)
                         {
-                            if (meleeAttacker != null && meleeAttacker.enabled)
+                            if (_meleeWeapon != null && _meleeWeapon.enabled)
                             {
-                                meleeAttacker.Attack(victim, combat.attackDamage);
-                                lastAttackTime = Time.time;
+                                _meleeWeapon.Attack(victim, combat.attackDamage);
+                                _lastAttackTime = Time.time;
                             }
                         }
                     }
@@ -167,17 +167,17 @@ namespace Enemies
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (!enemyController || enemyController.isDead) return;
+            if (!_enemyController || _enemyController.isDead) return;
 
             // attack radius
-            if (state == MeleeEnemyState.attacking)
+            if (state == MeleeEnemyState.Attacking)
             {
                 Gizmos.color = Color.red / 3;
                 Gizmos.DrawSphere(transform.position, combat.attackRadius);
             }
 
             // chasing player
-            if (enemyController.isPlayerNoticed)
+            if (_enemyController.isPlayerNoticed)
             {
 
                 if (victim?.transform?.position != null)
@@ -187,7 +187,7 @@ namespace Enemies
             }
 
             // wandering point
-            if (state == MeleeEnemyState.wandering)
+            if (state == MeleeEnemyState.Wandering)
             {
                 Gizmos.DrawLine(transform.position, wanderToPoint);
             }
