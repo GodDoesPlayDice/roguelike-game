@@ -47,19 +47,9 @@ public class PlayerController : MonoBehaviour
     // privates for rotation
     private float _turnSmoothVelocity;
     private float _targetAngleY;
-
-
-    // fighting system variables
-    [System.Serializable]
-    public class PlayerCombat
-    {
-        public float meleeAttackRadius = 1f;
-        public float meleeAttackDamage = 20f;
-    }
-
-    public PlayerCombat combat;
-    private MeleeWeapon _meleeWeaponController;
-    private Shooter _shooterController;
+    
+    
+    private ActorCombatController _combatController;
     private bool _isCloseToEnemies = false;
 
 
@@ -69,6 +59,7 @@ public class PlayerController : MonoBehaviour
     {
         public UnityEvent OnDestinationReachedEvent;
     }
+
     public PlayerEventsFields events;
 
     // input system part
@@ -88,7 +79,7 @@ public class PlayerController : MonoBehaviour
     {
         if (value.performed)
         {
-            MeleeAttack();
+            _combatController.MeleeAttack();
         }
     }
 
@@ -104,8 +95,6 @@ public class PlayerController : MonoBehaviour
     {
         _cam = GameObject.FindGameObjectWithTag("MainCamera");
         TryGetComponent(out _rb);
-        TryGetComponent(out _meleeWeaponController);
-        TryGetComponent(out _shooterController);
         TryGetComponent(out navMeshAgent);
     }
 
@@ -239,24 +228,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MeleeAttack()
-    {
-        if (_meleeWeaponController == null) return;
-        Collider[] enemies = Physics.OverlapSphere(transform.position, combat.meleeAttackRadius);
-
-        foreach (Collider enemy in enemies)
-        {
-            _meleeWeaponController.Attack(enemy.gameObject, combat.meleeAttackDamage);
-        }
-    }
-
-    private void ShootAttack()
-    {
-        if (_shooterController == null) return;
-        
-
-    }
-
     private void Interact()
     {
         if (_nearestInteractable != null)
@@ -268,7 +239,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    
+
     private IEnumerator UpdateNearestInteractable()
     {
         for (;;)
@@ -303,12 +274,13 @@ public class PlayerController : MonoBehaviour
             _isCloseToEnemies = false;
             foreach (GameObject enemy in enemies)
             {
-                if (Vector3.Distance(enemy.transform.position, transform.position) <= combat.meleeAttackRadius)
+                if (Vector3.Distance(enemy.transform.position, transform.position) <= _combatController.meleeAttackRadius)
                 {
                     _isCloseToEnemies = true;
                     break;
                 }
             }
+
             yield return new WaitForSeconds(0.1f);
         }
     }
@@ -326,7 +298,7 @@ public class PlayerController : MonoBehaviour
             Gizmos.color = Color.yellow / 4;
         }
 
-        Gizmos.DrawSphere(transform.position, combat.meleeAttackRadius);
+        Gizmos.DrawSphere(transform.position, _combatController.meleeAttackRadius);
 
         // interaction range 
         if (_nearestInteractable)

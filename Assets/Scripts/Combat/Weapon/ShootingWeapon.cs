@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace Combat
 {
-    public class Shooter : MonoBehaviour
+    public class ShootingWeapon : MonoBehaviour, IWeapon
     {
         public GameObject projectile;
-
-        public void Shoot(GameObject victim, float damage, float projectileSpeed)
+        public float damage = 10f;
+        public float projectileSpeed = 10f;
+        public void Attack(GameObject victim)
         {
             if (projectile == null)
             {

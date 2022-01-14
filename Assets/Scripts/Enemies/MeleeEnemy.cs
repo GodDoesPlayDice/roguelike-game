@@ -154,7 +154,7 @@ namespace Enemies
                         {
                             if (_meleeWeapon != null && _meleeWeapon.enabled)
                             {
-                                _meleeWeapon.Attack(victim, combat.attackDamage);
+                                _meleeWeapon.Attack(victim);
                                 _lastAttackTime = Time.time;
                             }
                         }

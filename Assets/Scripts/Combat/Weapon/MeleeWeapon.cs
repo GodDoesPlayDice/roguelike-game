@@ -2,14 +2,15 @@ using UnityEngine;
 
 namespace Combat
 {
-    public class MeleeWeapon : MonoBehaviour
+    public class MeleeWeapon : MonoBehaviour, IWeapon
     {
-        public void Attack(GameObject victim, float damageAmount)
+        public float damage = 10f;
+        public void Attack(GameObject victim)
         {
             victim.TryGetComponent<TargetController>(out var targetController);
             if (targetController != null && targetController.gameObject != gameObject)
             {
-                targetController.TakeDamage(damageAmount);
+                targetController.TakeDamage(damage);
             }
         }
     }
