@@ -12,10 +12,9 @@ namespace Actors
     [RequireComponent(typeof(TargetController))]
     [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(ActorController))]
-    public class PlayerController : MonoBehaviour, IActor
+    [RequireComponent(typeof(ActorCombatController))]
+    public class PlayerController : MonoBehaviour
     {
-        public GameObject thisObject { get; set; }
-
         // some basic vars 
         private ActorController _actorController;
         private Rigidbody _rb;
@@ -64,7 +63,7 @@ namespace Actors
         {
             if (value.performed)
             {
-                _combatController.ShootAttack();
+                // _combatController.ShootAttack();
             }
         }
 
@@ -82,8 +81,6 @@ namespace Actors
             TryGetComponent(out _rb);
             TryGetComponent(out _combatController);
             TryGetComponent(out _actorController);
-
-            thisObject = gameObject;
         }
 
         private void Start()
@@ -125,7 +122,6 @@ namespace Actors
         {
             if (_actorController.navMeshActive)
             {
-                _rb.velocity = Vector3.zero;
                 _movementInput = Vector2.zero;
                 return;
             }
@@ -150,11 +146,6 @@ namespace Actors
             _rb.velocity = _movementInput.magnitude >= 0.1f
                 ? new Vector3(movementVector.x * speed, _rb.velocity.y, movementVector.z * speed)
                 : new Vector3(0f, _rb.velocity.y, 0f);
-        }
-
-        public void StopMovement()
-        {
-            _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
         }
 
         private void Interact()

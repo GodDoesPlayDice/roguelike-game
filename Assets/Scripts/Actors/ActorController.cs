@@ -20,12 +20,14 @@ namespace Actors
         // nav mesh part
         public float destinationThreshold = .1f;
         private NavMeshAgent _navMeshAgent;
+        private Rigidbody _rb;
 
         public List<GameObject> nearFoeActors { get; private set; } = new List<GameObject>();
 
         private void Awake()
         {
             TryGetComponent(out _navMeshAgent);
+            TryGetComponent(out _rb);
         }
 
         private void Start()
@@ -36,6 +38,7 @@ namespace Actors
 
         public void SetDestination(Vector3 destination, float threshold)
         {
+            if (_rb != null) _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
             destinationThreshold = threshold;
             navMeshActive = true;
             _navMeshAgent.enabled = true;
@@ -46,7 +49,6 @@ namespace Actors
         public void UnsetDestination()
         {
             destinationThreshold = 0f;
-            _navMeshAgent.destination = Vector3.zero;
             _navMeshAgent.enabled = false;
             navMeshActive = false;
             StopCoroutine(CheckDestinationReachRoutine());

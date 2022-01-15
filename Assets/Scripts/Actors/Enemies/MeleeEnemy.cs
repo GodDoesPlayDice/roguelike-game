@@ -1,8 +1,10 @@
+using System;
 using Actors.Enemies;
 using Combat;
 using Combat.Weapon;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 namespace Enemies
 {
@@ -60,9 +62,9 @@ namespace Enemies
         }
         public EnemyWanderingFields wandering;
     
-        private Vector3 wanderToPoint;
-        private float lastTimeWanderPointChanged;
-        private float lastWanderingDurationRandIncrease;
+        private Vector3 _wanderToPoint;
+        private float _lastTimeWanderPointChanged;
+        private float _lastWanderingDurationRandIncrease;
 
         private void Awake()
         {
@@ -72,22 +74,22 @@ namespace Enemies
             victim = GameObject.FindGameObjectWithTag("Player");
         }
 
-        void Start()
+        private void Start()
         {
             // initial values
             _lastAttackTime = Time.time;
-            lastTimeWanderPointChanged = Time.time;
+            _lastTimeWanderPointChanged = Time.time;
             if (events.OnDestinationChangeEvent == null) events.OnDestinationChangeEvent = new UnityEvent<Vector3>();
             state = defaultState;
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             // check dist to player
             // check if attack is possible
-            Vector3 victimPosition = victim.transform.position;
-            float distToVictim = Vector3.Distance(transform.position, victimPosition);
+            var victimPosition = victim.transform.position;
+            var distToVictim = Vector3.Distance(transform.position, victimPosition);
 
             switch (state)
             {
@@ -100,22 +102,22 @@ namespace Enemies
                     else
                     {
                         // speed
-                        if (_enemyController.navMeshAgent.speed == _enemyController.normalMovementSpeed)
+                        if (Math.Abs(_enemyController.navMeshAgent.speed - _enemyController.normalMovementSpeed) < 0.01f)
                         {
                             _enemyController.navMeshAgent.speed = _enemyController.normalMovementSpeed * wandering.speedMultiplier;
                         }
 
                         // calculate new wander point
-                        if (Time.time - lastTimeWanderPointChanged >= wandering.basicDuration + lastWanderingDurationRandIncrease)
+                        if (Time.time - _lastTimeWanderPointChanged >= wandering.basicDuration + _lastWanderingDurationRandIncrease)
                         {
                             float multiplier = Random.Range(2, 5);
 
                             Vector3 randomDirection = Random.insideUnitCircle.normalized * Mathf.Clamp(multiplier, 1, multiplier < 1 ? 1 : multiplier);
-                            wanderToPoint = transform.position + new Vector3(randomDirection.x, transform.position.y, randomDirection.z);
-                            events.OnDestinationChangeEvent?.Invoke(wanderToPoint);
+                            _wanderToPoint = transform.position + new Vector3(randomDirection.x, transform.position.y, randomDirection.z);
+                            events.OnDestinationChangeEvent?.Invoke(_wanderToPoint);
 
-                            lastTimeWanderPointChanged = Time.time;
-                            lastWanderingDurationRandIncrease = Random.Range(0, wandering.durationMaxRandIncrease);
+                            _lastTimeWanderPointChanged = Time.time;
+                            _lastWanderingDurationRandIncrease = Random.Range(0, wandering.durationMaxRandIncrease);
                         }
                     }
                     break;
@@ -162,8 +164,6 @@ namespace Enemies
                         }
                     }
                     break;
-                case MeleeEnemyState afterAttackAttemp:
-                    break;
             }
         }
 #if UNITY_EDITOR
@@ -191,7 +191,7 @@ namespace Enemies
             // wandering point
             if (state == MeleeEnemyState.Wandering)
             {
-                Gizmos.DrawLine(transform.position, wanderToPoint);
+                Gizmos.DrawLine(transform.position, _wanderToPoint);
             }
         }
 #endif

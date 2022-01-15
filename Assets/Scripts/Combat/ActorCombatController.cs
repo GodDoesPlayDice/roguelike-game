@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Actors;
@@ -11,6 +12,10 @@ namespace Combat
 {
     public class ActorCombatController : MonoBehaviour
     {
+        public IWeapon CurrentWeapon;
+        public bool autoAttack = false;
+        public float autoAttackRate = 0.5f;
+
         public float meleeAttackRadius = 2f;
         public float shootAttackRadius = 5f;
 
@@ -18,6 +23,7 @@ namespace Combat
         private ShootingWeapon _shootingWeaponController;
 
         private ActorController _actorController;
+
         private void Awake()
         {
             TryGetComponent(out _meleeWeaponController);
@@ -25,27 +31,36 @@ namespace Combat
             TryGetComponent(out _actorController);
         }
 
-        public void ChangeWeapon()
+        private void Start()
         {
+            CurrentWeapon = _shootingWeaponController;
+            StartCoroutine(AutoAttackCoroutine());
         }
 
-        public void MeleeAttack()
+        public void ChangeWeapon()
         {
-            if (_meleeWeaponController == null) return;
-            Collider[] enemies = Physics.OverlapSphere(transform.position, meleeAttackRadius);
-
-            foreach (Collider enemy in enemies)
+            if ((MeleeWeapon) CurrentWeapon == _meleeWeaponController)
             {
-                _meleeWeaponController.Attack(enemy.gameObject);
+                CurrentWeapon = _shootingWeaponController;
+            }
+            else
+            {
+                CurrentWeapon = _meleeWeaponController;
             }
         }
 
-        public void ShootAttack()
+
+        private IEnumerator AutoAttackCoroutine()
         {
-            if (_shootingWeaponController == null) return;
-            if (!_actorController.nearFoeActors.Any()) return;
-            var first = _actorController.nearFoeActors.First();
-            _shootingWeaponController.Attack(first);
+            for (;;)
+            {
+                if (_actorController.nearFoeActors.Any() && autoAttack)
+                {
+                    CurrentWeapon.Attack(_actorController.nearFoeActors.First());
+                }
+
+                yield return new WaitForSeconds(autoAttackRate);
+            }
         }
     }
 }

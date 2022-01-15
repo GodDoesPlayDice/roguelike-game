@@ -439,6 +439,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5450e3df9a67432ba3abdc4d2a45f28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoAttack: 1
+  autoAttackRate: 0.3
   meleeAttackRadius: 2
   shootAttackRadius: 5
 --- !u!114 &820912426
@@ -483,6 +485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foeTags:
   - Enemy
+  findFoesInterval: 0.1
   distToFindFoeActors: 5
   onDestinationReachedEvent:
     m_PersistentCalls:
