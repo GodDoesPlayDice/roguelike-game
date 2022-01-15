@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6696955925239701273}
   m_Layer: 0
   m_Name: RoomWithEnemies
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -62,3 +62,5 @@ MonoBehaviour:
   enemiesToSpawn:
   - enemy: {fileID: 8321811766543441125, guid: 25da63290b6b64ec7a23898f9ed85238, type: 3}
     amount: 3
+  minEnemiesToStartSpawn: 1
+  singleSpawnPortion: 3

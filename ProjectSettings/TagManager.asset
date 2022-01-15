@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - Interactive
   - GameManager
+  - Room
   layers:
   - Default
   - TransparentFX

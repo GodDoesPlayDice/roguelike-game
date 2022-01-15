@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Events;
 
 namespace Combat
@@ -11,16 +12,18 @@ namespace Combat
         public float damage = 0;
         public UnityEvent<GameObject> onProjectileHitEvent;
 
+        public List<string> ignoreTags = new List<string>();
         private void Awake()
         {
             onProjectileHitEvent ??= new UnityEvent<GameObject>();
+            Debug.Log(gameObject.name);
         }
 
         private void OnTriggerEnter(Collider other)
         {
             onProjectileHitEvent.Invoke(other.gameObject);
 
-            if (!CompareTag(other.gameObject.tag))
+            if (!ignoreTags.Contains(other.gameObject.tag))
             { 
                 other.gameObject.TryGetComponent<TargetController>(out var targetController);
                 if (targetController != null) targetController.TakeDamage(damage);

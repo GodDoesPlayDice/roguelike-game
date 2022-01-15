@@ -125,7 +125,8 @@ namespace Actors
         {
             if (_actorController.navMeshActive)
             {
-                if (_rb.velocity != Vector3.zero) _rb.velocity = Vector3.zero;
+                _rb.velocity = Vector3.zero;
+                _movementInput = Vector2.zero;
                 return;
             }
 

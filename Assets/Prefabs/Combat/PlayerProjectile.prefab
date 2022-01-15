@@ -164,3 +164,6 @@ MonoBehaviour:
   onProjectileHitEvent:
     m_PersistentCalls:
       m_Calls: []
+  ignoreTags:
+  - Room
+  - Player
