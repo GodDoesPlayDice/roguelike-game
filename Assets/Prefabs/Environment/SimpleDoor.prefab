@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  anotherSideReachThreshold: 0.211
+  anotherSideReachThreshold: 0.17
   interactTimeRate: 1
   openDoorPosition: {x: 0, y: 3, z: 0}
   leftSidePoint: {x: 0, y: 0, z: 0}

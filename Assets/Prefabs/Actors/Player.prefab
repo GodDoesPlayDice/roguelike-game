@@ -481,6 +481,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c13e1ec6d54a47e08858d5df6bea4f9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  foeTags:
+  - Enemy
+  distToFindFoeActors: 5
   onDestinationReachedEvent:
     m_PersistentCalls:
       m_Calls: []

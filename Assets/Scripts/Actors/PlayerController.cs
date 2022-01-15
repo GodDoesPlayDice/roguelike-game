@@ -90,7 +90,6 @@ namespace Actors
         {
             _movementInput = new Vector2();
             StartCoroutine(UpdateNearestInteractable());
-            StartCoroutine(UpdateNearestEnemies());
         }
 
         public void OnHealthChanged(GameObject gameObj, float health)
@@ -181,27 +180,6 @@ namespace Actors
                     if (!(dist < minFoundDist) || !(dist <= interactionRadius)) continue;
                     minFoundDist = dist;
                     _nearestInteractable = interactable;
-                }
-
-                yield return new WaitForSeconds(0.1f);
-            }
-        }
-
-        private IEnumerator UpdateNearestEnemies()
-        {
-            for (;;)
-            {
-                // define if there are enemies inside melee attack radius
-                var enemies = GameObject.FindGameObjectsWithTag("Enemy");
-                _isCloseToEnemies = false;
-                foreach (GameObject enemy in enemies)
-                {
-                    if (Vector3.Distance(enemy.transform.position, transform.position) <=
-                        _combatController.meleeAttackRadius)
-                    {
-                        _isCloseToEnemies = true;
-                        break;
-                    }
                 }
 
                 yield return new WaitForSeconds(0.1f);

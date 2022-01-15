@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: -2410753494388890424}
   - component: {fileID: 4246832891215340998}
   - component: {fileID: 1578466432698928992}
+  - component: {fileID: -3984424230733184323}
   m_Layer: 0
   m_Name: BasicEnemy
   m_TagString: Enemy
@@ -360,6 +361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meleeAttackRadius: 1
+  shootAttackRadius: 5
 --- !u!114 &1578466432698928992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,3 +375,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
+--- !u!114 &-3984424230733184323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8321811766543441125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c13e1ec6d54a47e08858d5df6bea4f9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  foeTags:
+  - Player
+  findFoesInterval: 0.3
+  distToFindFoeActors: 5
+  onDestinationReachedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  destinationThreshold: 0.1
