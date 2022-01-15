@@ -4,38 +4,35 @@ using UnityEngine;
 namespace Environment
 {
     [RequireComponent(typeof(MeshRenderer))]
-    public class DoorController : MonoBehaviour, IInteractable<PlayerController>
+    public class DoorController : MonoBehaviour, IInteractable<ActorController>
     {
         public enum DoorState
         {
             Closed,
             Open
         }
+
         public DoorState state = DoorState.Closed;
         private bool _isLocked = false;
         private bool _isBusy = false;
 
 
-        [Range(0, 1)]
-        public float anotherSideReachThreshold = .1f;
+        [Range(0, 1)] public float anotherSideReachThreshold = .1f;
         public float interactTimeRate = 1f;
         private float _prevInteractEndTime = 0f;
 
         // vars for open and closed state difference
-        [SerializeField]
-        private Vector3 openDoorPosition;
+        [SerializeField] private Vector3 openDoorPosition;
         private Vector3 _closedDoorPosition;
         private Material _material;
         private Color _defaultColor;
 
         // these points are needed in order to move the player and so that the room can find doors
-        [HideInInspector]
-        public Vector3 leftSidePoint;
-        [HideInInspector]
-        public Vector3 rightSidePoint;
+        [HideInInspector] public Vector3 leftSidePoint;
+        [HideInInspector] public Vector3 rightSidePoint;
 
 
-        private PlayerController _playerController;
+        private ActorController _actorController;
 
         private void Awake()
         {
@@ -55,37 +52,33 @@ namespace Environment
             _prevInteractEndTime = Time.time;
         }
 
-        public void Interact(PlayerController player)
+        public void Interact(ActorController actor)
         {
             if (Time.time - _prevInteractEndTime < interactTimeRate) return;
             if (_isLocked || _isBusy) return;
-            // cache player controller on first interaction
-            if (_playerController == null) _playerController = player;
+            _actorController = actor;
             MakeOpen();
-            // move player
-            var position = _playerController.gameObject.transform.position;
-            Vector2 playerPos = new Vector2(position.x, position.z);
-            Vector2 right = new Vector2(rightSidePoint.x, rightSidePoint.z);
-            Vector2 left = new Vector2(leftSidePoint.x, leftSidePoint.z);
-            float distToRight = Vector2.Distance(playerPos, right);
-            float distToLeft = Vector2.Distance(playerPos, left);
+            // move actor
+            var position = _actorController.gameObject.transform.position;
+            var playerPos = new Vector2(position.x, position.z);
+            var rightPoint = new Vector2(rightSidePoint.x, rightSidePoint.z);
+            var leftPoint = new Vector2(leftSidePoint.x, leftSidePoint.z);
+            var distToRight = Vector2.Distance(playerPos, rightPoint);
+            var distToLeft = Vector2.Distance(playerPos, leftPoint);
 
-            Vector3 destination = distToRight > distToLeft ? rightSidePoint : leftSidePoint;
-            _playerController.StopMovement();
-            _playerController.SetDestination(destination, anotherSideReachThreshold);
+            var destination = distToRight > distToLeft ? rightSidePoint : leftSidePoint;
+            _actorController.SetDestination(destination, anotherSideReachThreshold);
             // subscribe on destination reached event
-            _playerController.events.OnDestinationReachedEvent.AddListener(OnPlayerWalkedThrough);
+            _actorController.onDestinationReachedEvent.AddListener(OnActorWalkedThrough);
             _isBusy = true;
         }
 
-        private void OnPlayerWalkedThrough()
+        private void OnActorWalkedThrough()
         {
             _isBusy = false;
             _prevInteractEndTime = Time.time;
             if (!_isLocked) MakeClosed();
-            _playerController.UnsetDestination();
-            // unsubscribe on destination reached event
-            _playerController.events.OnDestinationReachedEvent.RemoveListener(OnPlayerWalkedThrough);
+            _actorController.UnsetDestination();
         }
 
         private void MakeClosed()
@@ -104,6 +97,7 @@ namespace Environment
             if (transform.position != openDoorPosition) transform.position = openDoorPosition;
             _material.color = Color.green * 1.3f;
         }
+
         public void LockDoor()
         {
             MakeClosed();

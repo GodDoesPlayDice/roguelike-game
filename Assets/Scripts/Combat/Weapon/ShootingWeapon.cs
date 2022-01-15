@@ -34,14 +34,5 @@ namespace Combat.Weapon
             rb.velocity = direction.normalized * projectileSpeed;
             projectileController.StartLiveTime();
         }
-
-        
-
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            
-        }
-#endif
     }
 }

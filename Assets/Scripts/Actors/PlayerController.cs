@@ -1,5 +1,6 @@
 using System.Collections;
 using Combat;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -8,14 +9,15 @@ using UnityEngine.InputSystem;
 namespace Actors
 {
     [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(TargetController))]
     [RequireComponent(typeof(PlayerInput))]
+    [RequireComponent(typeof(ActorController))]
     public class PlayerController : MonoBehaviour, IActor
     {
         public GameObject thisObject { get; set; }
+
         // some basic vars 
-        public bool disableControls = false;
+        private ActorController _actorController;
         private Rigidbody _rb;
         private GameObject _cam;
 
@@ -31,17 +33,9 @@ namespace Actors
             [Range(0.01f, 5)] public float accelerationTime = 1f;
             public float turnSmoothTime = 0.1f;
         }
-
         public PlayerMovement movement;
-
-
         // private variables for movement
         private Vector2 _movementInput;
-
-        // nav mesh part
-        [HideInInspector] public NavMeshAgent navMeshAgent;
-        [HideInInspector] public float destinationThreshold = 0f;
-
 
         // acceleration
         private float _currentMovementDuration = 0;
@@ -49,20 +43,9 @@ namespace Actors
         // privates for rotation
         private float _turnSmoothVelocity;
         private float _targetAngleY;
-    
-    
+
         private ActorCombatController _combatController;
         private bool _isCloseToEnemies = false;
-
-
-        // events part
-        [System.Serializable]
-        public class PlayerEventsFields
-        {
-            public UnityEvent OnDestinationReachedEvent;
-        }
-
-        public PlayerEventsFields events;
 
         // input system part
         public void OnMovement(InputAction.CallbackContext value)
@@ -98,43 +81,16 @@ namespace Actors
             _cam = GameObject.FindGameObjectWithTag("MainCamera");
             TryGetComponent(out _rb);
             TryGetComponent(out _combatController);
-            TryGetComponent(out navMeshAgent);
+            TryGetComponent(out _actorController);
+
             thisObject = gameObject;
         }
 
         private void Start()
         {
             _movementInput = new Vector2();
-            if (navMeshAgent != null) navMeshAgent.enabled = false;
-            if (events.OnDestinationReachedEvent == null) events.OnDestinationReachedEvent = new UnityEvent();
-
             StartCoroutine(UpdateNearestInteractable());
             StartCoroutine(UpdateNearestEnemies());
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            // updating acceleration variables
-            if (_movementInput.magnitude >= 0.1f)
-            {
-                _currentMovementDuration += Time.deltaTime;
-            }
-            else if (_movementInput.magnitude == 0f)
-            {
-                _currentMovementDuration = 0;
-            }
-
-
-            // nav mesh agent movement part
-            if (navMeshAgent.enabled)
-            {
-                // if the player has reached the destination
-                if (DidReachDestination())
-                {
-                    events.OnDestinationReachedEvent.Invoke();
-                }
-            }
         }
 
         public void OnHealthChanged(GameObject gameObj, float health)
@@ -150,17 +106,15 @@ namespace Actors
 
         private void FixedUpdate()
         {
-            if (!disableControls)
-            {
-                Move();
-                Rotation();
-            }
+            Movement();
+            Rotation();
         }
 
         private void Rotation()
         {
             // calculate camera look angle to rotate
-            _targetAngleY = Mathf.Atan2(_movementInput.x, _movementInput.y) * Mathf.Rad2Deg + _cam.transform.eulerAngles.y;
+            _targetAngleY = Mathf.Atan2(_movementInput.x, _movementInput.y) * Mathf.Rad2Deg +
+                            _cam.transform.eulerAngles.y;
             // smooth
             float tempAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetAngleY, ref _turnSmoothVelocity,
                 movement.turnSmoothTime);
@@ -168,25 +122,34 @@ namespace Actors
             transform.rotation = Quaternion.Euler(0f, tempAngle, 0f);
         }
 
-        private void Move()
+        private void Movement()
         {
-            // caclulate acceleration part
-            float acceleration = Mathf.Clamp01(_currentMovementDuration / movement.accelerationTime);
-            float speed = Time.fixedDeltaTime * movement.movementSpeed * acceleration;
+            if (_actorController.navMeshActive)
+            {
+                if (_rb.velocity != Vector3.zero) _rb.velocity = Vector3.zero;
+                return;
+            }
 
-            // camera aim part
-            Vector3 movementVector = Quaternion.Euler(0f, _targetAngleY, 0f) * Vector3.forward;
-
+            // updating acceleration variables
             if (_movementInput.magnitude >= 0.1f)
             {
-                // add velocity
-                _rb.velocity = new Vector3(movementVector.x * speed, _rb.velocity.y, movementVector.z * speed);
+                _currentMovementDuration += Time.fixedDeltaTime;
             }
             else
             {
-                // add velocity
-                _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
+                _currentMovementDuration = 0;
             }
+
+            // calculate acceleration part
+            var acceleration = Mathf.Clamp01(_currentMovementDuration / movement.accelerationTime);
+            var speed = Time.fixedDeltaTime * movement.movementSpeed * acceleration;
+
+            // camera aim part
+            var movementVector = Quaternion.Euler(0f, _targetAngleY, 0f) * Vector3.forward;
+
+            _rb.velocity = _movementInput.magnitude >= 0.1f
+                ? new Vector3(movementVector.x * speed, _rb.velocity.y, movementVector.z * speed)
+                : new Vector3(0f, _rb.velocity.y, 0f);
         }
 
         public void StopMovement()
@@ -194,54 +157,11 @@ namespace Actors
             _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
         }
 
-        public void SetDestination(Vector3 destination, float threshold)
-        {
-            destinationThreshold = threshold;
-            disableControls = true;
-            navMeshAgent.enabled = true;
-            navMeshAgent.destination = destination;
-        }
-
-        public void UnsetDestination()
-        {
-            destinationThreshold = 0f;
-            navMeshAgent.destination = Vector3.zero;
-            navMeshAgent.enabled = false;
-            disableControls = false;
-            StopMovement();
-        }
-
-        public bool DidReachDestination()
-        {
-            Vector2 destination = new Vector2(navMeshAgent.destination.x, navMeshAgent.destination.z);
-            Vector2 playerPos = new Vector2(transform.position.x, transform.position.z);
-
-            float dist = Vector2.Distance(destination, playerPos);
-
-            if (dist <= destinationThreshold)
-            {
-                //Debug.Log("player pos: " + playerPos);
-                //Debug.Log("destination: " + destination);
-                //Debug.Log("distance: " + dist);
-                //Debug.Log("threshold: " + destinationThreshold);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         private void Interact()
         {
-            if (_nearestInteractable != null)
-            {
-                _nearestInteractable.TryGetComponent<IInteractable<PlayerController>>(out var interactableController);
-                if (interactableController != null)
-                {
-                    interactableController.Interact(this);
-                }
-            }
+            if (_nearestInteractable == null) return;
+            _nearestInteractable.TryGetComponent<IInteractable<ActorController>>(out var interactableController);
+            interactableController?.Interact(_actorController);
         }
 
         private IEnumerator UpdateNearestInteractable()
@@ -250,19 +170,17 @@ namespace Actors
             {
                 _nearestInteractable = null;
                 // define if there are interaction objects inside interaction radius
-                GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactive");
-                float minFoundDist = Mathf.Infinity;
-                foreach (GameObject interactable in interactables)
+                var interactables = GameObject.FindGameObjectsWithTag("Interactive");
+                var minFoundDist = Mathf.Infinity;
+                foreach (var interactable in interactables)
                 {
                     var position = interactable.transform.position;
-                    Vector2 interactablePos2D = new Vector2(position.x, position.z);
-                    Vector2 playerPos2D = new Vector2(transform.position.x, transform.position.z);
-                    float dist = Vector2.Distance(interactablePos2D, playerPos2D);
-                    if (dist < minFoundDist && dist <= interactionRadius)
-                    {
-                        minFoundDist = dist;
-                        _nearestInteractable = interactable;
-                    }
+                    var interactablePos2D = new Vector2(position.x, position.z);
+                    var playerPos2D = new Vector2(transform.position.x, transform.position.z);
+                    var dist = Vector2.Distance(interactablePos2D, playerPos2D);
+                    if (!(dist < minFoundDist) || !(dist <= interactionRadius)) continue;
+                    minFoundDist = dist;
+                    _nearestInteractable = interactable;
                 }
 
                 yield return new WaitForSeconds(0.1f);
@@ -274,11 +192,12 @@ namespace Actors
             for (;;)
             {
                 // define if there are enemies inside melee attack radius
-                GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+                var enemies = GameObject.FindGameObjectsWithTag("Enemy");
                 _isCloseToEnemies = false;
                 foreach (GameObject enemy in enemies)
                 {
-                    if (Vector3.Distance(enemy.transform.position, transform.position) <= _combatController.meleeAttackRadius)
+                    if (Vector3.Distance(enemy.transform.position, transform.position) <=
+                        _combatController.meleeAttackRadius)
                     {
                         _isCloseToEnemies = true;
                         break;

@@ -117,6 +117,7 @@ GameObject:
   - component: {fileID: 4811518499825723679}
   - component: {fileID: 820912426}
   - component: {fileID: 1959724826522501367}
+  - component: {fileID: 8521033013677581285}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -376,21 +377,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53911f919f9084736adedb84f32152e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disableControls: 0
   interactionRadius: 2
   movement:
     movementSpeed: 350
     accelerationTime: 0.7
     turnSmoothTime: 0.2
-  navMeshAgent: {fileID: 0}
-  destinationThreshold: 0.46
-  combat:
-    meleeAttackRadius: 2
-    meleeAttackDamage: 15
-  events:
-    OnDestinationReachedEvent:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!114 &1492491559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,6 +439,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5450e3df9a67432ba3abdc4d2a45f28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meleeAttackRadius: 2
+  shootAttackRadius: 5
 --- !u!114 &820912426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -460,6 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 879228a806b7d4924bca8015f494415d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 10
 --- !u!114 &1959724826522501367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,3 +467,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectile: {fileID: 8370739622347599995, guid: c2ed850adedc84797b8cf55fc574a1a3, type: 3}
+  damage: 10
+  projectileSpeed: 10
+--- !u!114 &8521033013677581285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8709167718908120739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c13e1ec6d54a47e08858d5df6bea4f9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDestinationReachedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  destinationThreshold: 0.1

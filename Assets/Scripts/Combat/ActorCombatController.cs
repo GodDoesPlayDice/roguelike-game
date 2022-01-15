@@ -43,14 +43,20 @@ namespace Combat
             if (_shootingWeaponController == null) return;
 
             // TODO: refactor this. need more optimized way 
-            var actors = FindObjectsOfType<MonoBehaviour>().OfType<IActor>()
-                .Select(t => t.thisObject)
-                .OrderBy(o => Vector3.Distance(gameObject.transform.position, o.transform.position));
-            _shootingWeaponController.Attack(actors.First(o =>
+            var possibleActors = FindObjectsOfType<MonoBehaviour>().OfType<IActor>();
+            var enumerable = possibleActors as IActor[] ?? possibleActors.ToArray();
+            if (enumerable.Count() > 1)
             {
-                var targetController = o.GetComponent<TargetController>();
-                return !CompareTag(o.tag) && !targetController.isDead;
-            }));
+                var actors =
+                    enumerable.Select(t => t.thisObject)
+                        .OrderBy(o => Vector3.Distance(gameObject.transform.position, o.transform.position));
+                if (actors != null && actors.Any())
+                    _shootingWeaponController.Attack(actors.First(o =>
+                    {
+                        var targetController = o.GetComponent<TargetController>();
+                        return !CompareTag(o.tag) && !targetController.isDead;
+                    }));
+            }
         }
     }
 }
