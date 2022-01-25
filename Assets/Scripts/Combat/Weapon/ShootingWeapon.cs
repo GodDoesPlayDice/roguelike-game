@@ -4,12 +4,14 @@ namespace Combat.Weapon
 {
     public class ShootingWeapon : MonoBehaviour, IWeapon
     {
+        public GameObject shootPoint;
         public GameObject projectile;
         public float damage = 10f;
         public float projectileSpeed = 10f;
         public void Attack(GameObject victim = null)
         {
             if (victim == null) return;
+            if (shootPoint == null) return;
             Debug.Log($"Shot victim: {victim.name}");
             if (projectile == null)
             {
@@ -17,7 +19,7 @@ namespace Combat.Weapon
                 return;
             }
             var direction = victim.transform.position - gameObject.transform.position;
-            var projectileInstance = Instantiate(projectile, transform.position, transform.rotation);
+            var projectileInstance = Instantiate(projectile, shootPoint.transform.position, shootPoint.transform.rotation);
             
             // rigidbody part
             projectileInstance.TryGetComponent<Rigidbody>(out var rb);
